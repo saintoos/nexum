@@ -57,7 +57,7 @@ Fitur:
 - Penjelasan hasil analisis bisnis.
 - Rekomendasi terkait pengembangan dan ekspansi usaha.
 
-## 👥 Aktor Sistem
+## Aktor Sistem
 
 NEXUM memiliki dua aktor utama:
 

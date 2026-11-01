@@ -5,20 +5,20 @@
 
 ---
 
-## 📌 Tentang NEXUM
+## Tentang NEXUM
 
 Ekspansi bisnis merupakan salah satu strategi pengembangan usaha yang memerlukan pertimbangan matang, khususnya dalam pemilihan lokasi dan evaluasi kondisi keuangan.
 
 NEXUM dikembangkan sebagai solusi digital yang membantu pelaku UMKM melakukan evaluasi bisnis melalui pengolahan data, visualisasi informasi, dan konsultasi berbasis kecerdasan buatan.
 
-## 🎯 Tujuan Pengembangan
+## Tujuan Pengembangan
 
 1. Membantu pelaku UMKM mengevaluasi kelayakan lokasi untuk ekspansi bisnis.
 2. Mengidentifikasi indikator risiko kegagalan usaha berdasarkan analisis laporan keuangan.
 3. Menyediakan informasi bisnis melalui visualisasi *Business Intelligence*.
 4. Membantu pelaku UMKM memperoleh konsultasi dan rekomendasi bisnis berbasis AI.
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 ### 1. Prediksi Kelayakan Lokasi Ekspansi
 Membantu pelaku UMKM mengevaluasi calon lokasi ekspansi berdasarkan koordinat geografis dan indikator pendukung yang dimasukkan pengguna.
@@ -66,7 +66,7 @@ NEXUM memiliki dua aktor utama:
 | Admin | Bertanggung jawab atas pengelolaan akun pengguna dan pemantauan operasional sistem. |
 | Pelaku UMKM | Pengguna utama yang mengelola profil usaha, melakukan analisis lokasi, mengunggah laporan keuangan, mengakses dashboard, dan menggunakan asisten AI. |
 
-## 🛠️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 *Technology stack* akan ditentukan dan diperbarui berdasarkan hasil analisis kebutuhan dan perancangan arsitektur sistem.
 
@@ -81,15 +81,15 @@ NEXUM memiliki dua aktor utama:
 | AI Integration | LLM API |
 | Data Visualization | Akan ditentukan |
 
-## 📂 Struktur Proyek
+## Struktur Proyek
 
 Struktur direktori akan disesuaikan dengan arsitektur frontend dan backend yang telah disepakati pada tahap perancangan sistem.
 
-## 🚀 Instalasi dan Menjalankan Proyek
+## Instalasi dan Menjalankan Proyek
 
 Petunjuk instalasi dan menjalankan aplikasi akan ditambahkan setelah konfigurasi teknologi, database, dan environment proyek ditetapkan.
 
-## 📋 Ruang Lingkup Pengembangan
+## Ruang Lingkup Pengembangan
 
 Pengembangan NEXUM dilakukan dengan pendekatan *Minimum Viable Product* (MVP).
 
@@ -103,7 +103,7 @@ Batasan pengembangan awal:
 - Asisten AI menggunakan layanan API LLM pihak ketiga.
 - Sistem tidak menjamin keberhasilan ekspansi maupun memprediksi kegagalan usaha secara pasti.
 
-## 👨‍💻 Tim Pengembang
+## Tim Pengembang
 
 Proyek NEXUM dikembangkan secara kolaboratif oleh:
 
@@ -114,7 +114,7 @@ Proyek NEXUM dikembangkan secara kolaboratif oleh:
 | Mutia | Development Team |
 | Kanya | Development Team |
 
-## 📌 Project Status
+## Project Status
 
 **Development in Progress**
 
@@ -128,7 +128,7 @@ Tahapan pengembangan:
 5. Frontend dan backend development.
 6. Testing dan deployment.
 
-## 📄 Dokumentasi
+## Dokumentasi
 
 Dokumentasi pengembangan meliputi:
 - Software Requirements Specification (SRS).

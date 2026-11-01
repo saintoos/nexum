@@ -1,5 +1,97 @@
-# Object file
-*.o
+# ==========================================
+# NEXUM - Git Ignore
+# ==========================================
 
-# Ada Library Information
-*.ali
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.example.*
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache/
+.vite/
+.tmp/
+temp/
+
+# Python (AI / Data Processing)
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+venv/
+.venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+database-backup/
+backups/
+
+# Uploaded files and user data
+uploads/
+storage/uploads/
+private/
+*.xlsx
+*.xls
+*.pdf
+*.csv
+
+# IDE and editor
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+*.sublime-workspace
+*.sublime-project
+
+# Operating system
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Coverage and testing
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Docker
+*.pid
+docker-data/
+
+# Generated files
+*.min.js
+*.min.css

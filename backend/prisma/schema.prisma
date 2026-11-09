@@ -1,0 +1,256 @@
+
+// ---------------------------------- ENUM ------------------------------------
+
+enum UserRole {
+  ADMIN
+  UMKM
+
+  @@map("user_role")
+}
+
+enum ConfigModule {
+  LOCATION
+  FINANCIAL
+
+  @@map("config_module")
+}
+
+enum LocationCategory {
+  LAYAK
+  TIDAK_LAYAK
+
+  @@map("location_category")
+}
+
+enum RiskLevel {
+  SEHAT
+  WASPADA
+  RISIKO_TINGGI
+
+  @@map("risk_level")
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
+
+  @@map("chat_role")
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  CRITICAL
+
+  @@map("log_level")
+}
+
+// ---------------------------------- MODEL -----------------------------------
+
+model User {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String   @db.VarChar(100)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         UserRole @default(UMKM)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  businessProfile   BusinessProfile?
+  locationAnalyses  LocationAnalysis[]
+  financialAnalyses FinancialAnalysis[]
+  financialPeriods  FinancialPeriod[]
+  aiConsent         AiConsent?
+  aiUsages          AiUsage[]
+  chatMessages      ChatMessage[]
+  activityLogs      ActivityLog[]
+  createdConfigs    AnalysisConfig[]
+
+  @@map("users")
+}
+
+model BusinessProfile {
+  id                     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                 String   @unique @map("user_id") @db.Uuid
+  name                   String   @db.VarChar(150)
+  sector                 String   @db.VarChar(50)
+  sectorOther            String?  @map("sector_other") @db.VarChar(100)
+  address                String   @db.VarChar(255)
+  quarterlyRevenueTarget Decimal? @map("quarterly_revenue_target") @db.Decimal(14, 2)
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user              User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  locationAnalyses  LocationAnalysis[]
+  financialAnalyses FinancialAnalysis[]
+  financialPeriods  FinancialPeriod[]
+
+  @@map("business_profiles")
+}
+
+model AnalysisConfig {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  module        ConfigModule
+  versionNumber Int          @map("version_number")
+  isActive      Boolean      @default(false) @map("is_active")
+  parameters    Json
+  note          String?      @db.VarChar(255)
+  createdById   String?      @map("created_by") @db.Uuid
+  activatedAt   DateTime?    @map("activated_at") @db.Timestamptz(6)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  createdBy         User?               @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  locationAnalyses  LocationAnalysis[]
+  financialAnalyses FinancialAnalysis[]
+
+  @@unique([module, versionNumber])
+  @@map("analysis_configs")
+}
+
+model LocationAnalysis {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code              String           @unique @db.VarChar(20)
+  userId            String           @map("user_id") @db.Uuid
+  businessProfileId String           @map("business_profile_id") @db.Uuid
+  configId          String           @map("config_id") @db.Uuid
+  locationName      String           @map("location_name") @db.VarChar(150)
+  district          String           @db.VarChar(100)
+  latitude          Decimal          @db.Decimal(9, 6)
+  longitude         Decimal          @db.Decimal(9, 6)
+  rentCost          Decimal          @map("rent_cost") @db.Decimal(14, 2)
+  competitorCount   Int              @map("competitor_count")
+  accessibility     Int              @db.SmallInt
+  marketPotential   Int              @map("market_potential") @db.SmallInt
+  score             Decimal          @db.Decimal(5, 2)
+  category          LocationCategory
+  details           Json
+  strongestFactor   String           @map("strongest_factor") @db.VarChar(30)
+  weakestFactor     String           @map("weakest_factor") @db.VarChar(30)
+  warnings          Json             @default("[]")
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user            User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  businessProfile BusinessProfile @relation(fields: [businessProfileId], references: [id], onDelete: Restrict)
+  config          AnalysisConfig  @relation(fields: [configId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("location_analyses")
+}
+
+model FinancialAnalysis {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code              String    @unique @db.VarChar(20)
+  userId            String    @map("user_id") @db.Uuid
+  businessProfileId String    @map("business_profile_id") @db.Uuid
+  configId          String    @map("config_id") @db.Uuid
+  fileName          String    @map("file_name") @db.VarChar(255)
+  periodStart       DateTime  @map("period_start") @db.Date
+  periodEnd         DateTime  @map("period_end") @db.Date
+  periodsAnalyzed   Int       @map("periods_analyzed") @db.SmallInt
+  ratios            Json
+  ruleResults       Json      @map("rule_results")
+  patterns          Json      @default("[]")
+  excludedRules     Json      @default("[]") @map("excluded_rules")
+  warnings          Json      @default("[]")
+  riskIndex         Decimal   @map("risk_index") @db.Decimal(5, 2)
+  riskLevel         RiskLevel @map("risk_level")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  businessProfile BusinessProfile   @relation(fields: [businessProfileId], references: [id], onDelete: Restrict)
+  config          AnalysisConfig    @relation(fields: [configId], references: [id], onDelete: Restrict)
+  periods         FinancialPeriod[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("financial_analyses")
+}
+
+model FinancialPeriod {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String   @map("user_id") @db.Uuid
+  businessProfileId  String   @map("business_profile_id") @db.Uuid
+  periodStart        DateTime @map("period_start") @db.Date
+  revenue            Decimal  @db.Decimal(18, 2)
+  cogs               Decimal  @db.Decimal(18, 2)
+  operatingExpense   Decimal  @map("operating_expense") @db.Decimal(18, 2)
+  netIncome          Decimal  @map("net_income") @db.Decimal(18, 2)
+  currentAssets      Decimal  @map("current_assets") @db.Decimal(18, 2)
+  inventory          Decimal  @db.Decimal(18, 2)
+  totalAssets        Decimal  @map("total_assets") @db.Decimal(18, 2)
+  currentLiabilities Decimal  @map("current_liabilities") @db.Decimal(18, 2)
+  totalLiabilities   Decimal  @map("total_liabilities") @db.Decimal(18, 2)
+  equity             Decimal  @db.Decimal(18, 2)
+  sourceAnalysisId   String   @map("source_analysis_id") @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  businessProfile BusinessProfile   @relation(fields: [businessProfileId], references: [id], onDelete: Restrict)
+  sourceAnalysis  FinancialAnalysis @relation(fields: [sourceAnalysisId], references: [id], onDelete: Restrict)
+
+  @@unique([businessProfileId, periodStart])
+  @@index([userId, periodStart(sort: Desc)])
+  @@map("financial_periods")
+}
+
+model AiConsent {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  allowContext Boolean  @default(false) @map("allow_context")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@map("ai_consents")
+}
+
+model AiUsage {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  status       String   @db.VarChar(10)
+  contextUsed  Boolean  @map("context_used")
+  inputTokens  Int?     @map("input_tokens")
+  outputTokens Int?     @map("output_tokens")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ai_usages")
+}
+
+model ChatMessage {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  role        ChatRole
+  content     String   @db.Text
+  contextUsed Boolean  @default(false) @map("context_used")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("chat_messages")
+}
+
+model ActivityLog {
+  id        BigInt   @id @default(autoincrement())
+  userId    String?  @map("user_id") @db.Uuid
+  eventType String   @map("event_type") @db.VarChar(50)
+  level     LogLevel @default(INFO)
+  component String?  @db.VarChar(30)
+  errorCode String?  @map("error_code") @db.VarChar(50)
+  message   String   @db.VarChar(500)
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)])
+  @@index([level, createdAt(sort: Desc)])
+  @@index([eventType, createdAt(sort: Desc)])
+  @@map("activity_logs")
+}

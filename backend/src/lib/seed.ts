@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import bcrypt from 'bcrypt'; // ganti ke argon2 jika tim memilih argon2
-import { Prisma } from './generated/prisma/client'; // jalur mengikuti `output` generator
+import bcrypt from 'bcrypt';
+import { Prisma } from './generated/prisma/client'; 
 import { prisma } from './client';
 
 // ----------------------------------------------------------------------------

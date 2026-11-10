@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import { Prisma } from './generated/prisma/client'; 
-import { prisma } from './client';
+import { prisma } from './prisma-client';
 
 // ----------------------------------------------------------------------------
 // Konfigurasi awal

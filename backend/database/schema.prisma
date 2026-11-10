@@ -1,4 +1,14 @@
 
+// ---------------------------- DATABASE SOURCE -------------------------------
+
+datasource db {
+  provider = "postgresql"
+}
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/lib/generated/prisma/client"
+}
+
 // ---------------------------------- ENUM ------------------------------------
 
 enum UserRole {

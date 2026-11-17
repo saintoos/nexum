@@ -9,7 +9,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-export default function RegisterPage({ onNavigateToLogin }) {
+export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -91,18 +91,25 @@ export default function RegisterPage({ onNavigateToLogin }) {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col justify-center items-center px-4 py-8 sm:py-10">
         <div className="w-full max-w-[460px]">
-          {/* Back to Login Link */}
-          <div className="mb-4">
+          {/* Back Links */}
+          <div className="mb-4 flex items-center justify-between">
             <button
               type="button"
-              onClick={onNavigateToLogin}
+              onClick={onNavigateToLanding}
               className="inline-flex items-center text-xs md:text-sm text-slate-600 hover:text-[#0A2540] transition-colors group font-medium"
             >
               <ArrowLeft
                 size={14}
                 className="mr-1.5 transition-transform group-hover:-translate-x-1"
               />
-              Kembali ke Masuk
+              Kembali ke Beranda
+            </button>
+            <button
+              type="button"
+              onClick={onNavigateToLogin}
+              className="text-xs text-blue-700 hover:text-[#0A2540] font-medium hover:underline"
+            >
+              Masuk
             </button>
           </div>
 

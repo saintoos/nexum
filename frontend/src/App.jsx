@@ -133,7 +133,10 @@ function App() {
       )}
 
       {currentPage === "register" && (
-        <RegisterPage onNavigateToLogin={() => setCurrentPage("login")} />
+        <RegisterPage
+          onNavigateToLogin={() => setCurrentPage("login")}
+          onNavigateToLanding={() => setCurrentPage("landing")}
+        />
       )}
 
       {currentPage === "dashboard" && (

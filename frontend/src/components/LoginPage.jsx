@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { AtSign, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 
-export default function LoginPage() {
+export default function LoginPage({
+  onNavigateToRegister,
+  onLoginSuccess,
+  onNavigateToLanding,
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -23,6 +27,9 @@ export default function LoginPage() {
     setTimeout(() => {
       setIsLoading(false);
       alert(`Login berhasil untuk: ${email}`);
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
     }, 1000);
   };
 
@@ -52,8 +59,9 @@ export default function LoginPage() {
         <div className="w-full max-w-[460px]">
           {/* Back Link */}
           <div className="mb-4">
-            <a
-              href="#beranda"
+            <button
+              type="button"
+              onClick={onNavigateToLanding}
               className="inline-flex items-center text-xs md:text-sm text-slate-600 hover:text-[#0A2540] transition-colors group font-medium"
             >
               <ArrowLeft
@@ -61,7 +69,7 @@ export default function LoginPage() {
                 className="mr-1.5 transition-transform group-hover:-translate-x-1"
               />
               Kembali ke Beranda
-            </a>
+            </button>
           </div>
 
           {/* Login Card */}
@@ -260,12 +268,13 @@ export default function LoginPage() {
               {/* Bottom Register Option */}
               <div className="text-center text-xs text-slate-600 mt-7">
                 Belum memiliki akun Pelaku UMKM?{" "}
-                <a
-                  href="#daftar"
+                <button
+                  type="button"
+                  onClick={onNavigateToRegister}
                   className="text-blue-700 hover:text-blue-800 font-semibold underline underline-offset-2 transition-colors"
                 >
                   Daftar akun baru
-                </a>
+                </button>
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import TopNavbar from "./TopNavbar";
 import {
   LayoutGrid,
   MapPin,
@@ -102,67 +103,25 @@ export default function LocationPredictionPage({ onLogout, onNavigate }) {
 
   const handleMenuClick = (id) => {
     setActiveMenu(id);
-    if (id === "beranda" && onNavigate) onNavigate("dashboard");
-    if (id === "profil" && onNavigate) onNavigate("profile");
-    if (id === "lokasi" && onNavigate) onNavigate("location");
+    if (!onNavigate) return;
+    if (id === "beranda") onNavigate("dashboard");
+    if (id === "lokasi") onNavigate("location");
+    if (id === "keuangan") onNavigate("finance");
+    if (id === "konsultasi") onNavigate("ai");
+    if (id === "riwayat") onNavigate("history");
+    if (id === "profil") onNavigate("profile");
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafd] flex flex-col font-sans text-slate-800">
+    <div className="h-screen bg-[#f8fafd] flex flex-col font-sans text-slate-800 overflow-hidden">
       {/* 1. TOP NAVBAR */}
-      <header className="bg-[#0A2540] text-white px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm sticky top-0 z-30">
-        <div className="flex items-center gap-3">
-          <span className="font-extrabold text-lg sm:text-xl tracking-wider text-white">
-            NEXUM
-          </span>
-          <span className="text-slate-400 font-light text-sm">|</span>
-          <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider text-sky-300 uppercase hidden sm:inline-block">
-            INTELLIGENCE FOR UMKM
-          </span>
-        </div>
-
-        <div className="flex-1 max-w-md mx-4 hidden md:block">
-          <div className="relative flex items-center">
-            <Search size={15} className="absolute left-3 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Cari analitik, lokasi, risiko..."
-              className="w-full bg-[#133863] text-xs text-white placeholder-slate-400 rounded-lg pl-9 pr-4 py-2 outline-none focus:ring-1 focus:ring-sky-400 transition-all border border-blue-900/50"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            className="text-slate-300 hover:text-white relative p-1.5 rounded-full hover:bg-white/10 transition-colors"
-            title="Notifikasi"
-          >
-            <Bell size={18} />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-sky-400 rounded-full ring-2 ring-[#0A2540]"></span>
-          </button>
-
-          <div className="flex items-center gap-2.5 pl-2 border-l border-white/10">
-            <div className="text-right hidden sm:block">
-              <div className="text-xs font-semibold text-white leading-tight">
-                Siti Rahma
-              </div>
-              <div className="text-[10px] text-sky-300 font-medium">
-                UMKM RETAIL
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs ring-2 ring-white/20">
-              SR
-            </div>
-          </div>
-        </div>
-      </header>
+      <TopNavbar onNavigate={onNavigate} />
 
       {/* 2. BODY LAYOUT */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR */}
-        <aside className="w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between hidden md:flex shrink-0">
-          <nav className="p-4 space-y-1">
+        <aside className="w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between hidden md:flex shrink-0 h-full overflow-hidden">
+          <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeMenu === item.id;
@@ -186,7 +145,7 @@ export default function LocationPredictionPage({ onLogout, onNavigate }) {
             })}
           </nav>
 
-          <div className="p-4 border-t border-slate-100">
+          <div className="p-4 border-t border-slate-100 shrink-0">
             <button
               onClick={onLogout}
               className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 transition-colors"

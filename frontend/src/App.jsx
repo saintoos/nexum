@@ -8,10 +8,14 @@ import FinancialRiskPage from "./components/FinancialRiskPage";
 import AiConsultingPage from "./components/AIConsultingPage";
 import AnalysisHistoryPage from "./components/AnalysisHistoryPage";
 import LandingPage from "./components/LandingPage";
+import AdminDashboardPage from "./components/AdminDashboardPage";
 
 function App() {
-  // Pilihan awal halaman yang ingin ditampilkan ('dashboard', 'location', 'finance', dll.)
+  // Pilihan awal halaman yang ingin ditampilkan ('dashboard', 'location', 'finance', 'admin', dll.)
   const [currentPage, setCurrentPage] = useState("landing");
+  // Master Kredensial Admin NEXUM
+  const [adminEmail, setAdminEmail] = useState("daffarazan616@students.unnes.ac.id");
+  const [adminPassword, setAdminPassword] = useState("Orbit!Kopi72#Langit9Biru");
 
   return (
     <div className="App min-h-screen">
@@ -129,6 +133,19 @@ function App() {
           onNavigateToRegister={() => setCurrentPage("register")}
           onLoginSuccess={() => setCurrentPage("dashboard")}
           onNavigateToLanding={() => setCurrentPage("landing")}
+          onAdminLogin={() => setCurrentPage("admin")}
+          adminEmail={adminEmail}
+          adminPassword={adminPassword}
+        />
+      )}
+
+      {currentPage === "admin" && (
+        <AdminDashboardPage
+          onLogout={() => setCurrentPage("login")}
+          onSwitchToUser={() => setCurrentPage("dashboard")}
+          adminEmail={adminEmail}
+          adminPassword={adminPassword}
+          onUpdateAdminPassword={(newPass) => setAdminPassword(newPass)}
         />
       )}
 

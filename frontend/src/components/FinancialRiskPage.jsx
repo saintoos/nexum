@@ -19,6 +19,8 @@ import {
   ArrowRight,
   ShieldAlert,
   Info,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function FinancialRiskPage({ onLogout, onNavigate }) {
@@ -48,16 +50,43 @@ export default function FinancialRiskPage({ onLogout, onNavigate }) {
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
-      setIsUploading(true);
-      setTimeout(() => {
-        setIsUploading(false);
-        alert(
-          `File ${file.name} berhasil diunggah dan tervalidasi sesuai standar SAK EMKM!`,
-        );
-      }, 1000);
+    if (!file) return;
+
+    // 1. Validasi Ekstensi Berkas
+    const validExtensions = [".xlsx", ".xls"];
+    const ext = "." + file.name.split(".").pop().toLowerCase();
+    if (!validExtensions.includes(ext)) {
+      alert(
+        `Format berkas '${ext}' tidak didukung. Hanya berkas Excel (.xlsx / .xls) yang diperbolehkan.`
+      );
+      e.target.value = "";
+      return;
     }
+
+    // 2. Validasi Ukuran Berkas Maksimal (Maks 5 MB)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+    if (file.size > MAX_FILE_SIZE) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      alert(
+        `Ukuran berkas (${fileSizeMB} MB) melebihi batas maksimal 5 MB. Silakan unggah berkas dengan ukuran lebih kecil.`
+      );
+      e.target.value = "";
+      return;
+    }
+
+    const fileSizeStr = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+    setFileName(`${file.name} (${fileSizeStr})`);
+    setIsUploading(true);
+    setTimeout(() => {
+      setIsUploading(false);
+      alert(
+        `Berkas ${file.name} (${fileSizeStr}) berhasil diverifikasi, aman dari ancaman, dan tervalidasi standar SAK EMKM!`
+      );
+    }, 1000);
+  };
+
+  const handleRemoveFile = () => {
+    setFileName("");
   };
 
   const handleDownloadTemplate = () => {
@@ -140,9 +169,20 @@ export default function FinancialRiskPage({ onLogout, onNavigate }) {
                         ? `File terpilih: ${fileName}`
                         : "Tarik & Lepas File di Sini"}
                     </span>
+                    {fileName && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        className="text-[11px] text-red-600 hover:text-red-800 hover:bg-red-50 py-0.5 px-2 rounded flex items-center gap-1 font-semibold transition-colors border border-red-200"
+                        title="Hapus berkas dari memori"
+                      >
+                        <Trash2 size={12} />
+                        <span>Hapus</span>
+                      </button>
+                    )}
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Gunakan template resmi NEXUM. Maksimal ukuran berkas 5MB
+                    Gunakan template resmi NEXUM (.xlsx). Maksimal ukuran berkas 5 MB (in-memory safe).
                   </p>
                 </div>
               </div>

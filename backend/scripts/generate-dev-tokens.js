@@ -124,15 +124,6 @@ async function generateDevTokens() {
   console.log("-------------------------------------------------------");
   console.log(adminToken);
 
-  console.log("\n=======================================================");
-  console.log("PANDUAN PEMAKAIAN DI POSTMAN:");
-  console.log("1. Buka Postman pada request endpoint terkait.");
-  console.log("2. Buka tab 'Authorization'.");
-  console.log("3. Pilih Type: 'Bearer Token'.");
-  console.log("4. Paste salah satu token di atas ke kolom 'Token'.");
-  console.log("5. Klik 'Send' -> Seluruh endpoint langsung tembus!");
-  console.log("=======================================================\n");
-
   await prisma.$disconnect();
 }
 

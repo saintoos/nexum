@@ -123,6 +123,8 @@ async function generateDevTokens() {
   console.log("   - /api/admin/system-status");
   console.log("-------------------------------------------------------");
   console.log(adminToken);
+  
+  console.log("\n-------------------------------------------------------");
 
   await prisma.$disconnect();
 }

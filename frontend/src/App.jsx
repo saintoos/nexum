@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+
 import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import DashboardPage from "./components/DashboardPage";
@@ -9,196 +11,148 @@ import AiConsultingPage from "./components/AIConsultingPage";
 import AnalysisHistoryPage from "./components/AnalysisHistoryPage";
 import LandingPage from "./components/LandingPage";
 import AdminDashboardPage from "./components/AdminDashboardPage";
+import NotFoundPage from "./components/NotFoundPage";
 
-function App() {
-  // Pilihan awal halaman yang ingin ditampilkan ('dashboard', 'location', 'finance', 'admin', dll.)
-  const [currentPage, setCurrentPage] = useState("landing");
+function AppContent() {
+  const navigate = useNavigate();
+
   // Master Kredensial Admin NEXUM
   const [adminEmail, setAdminEmail] = useState("daffarazan616@students.unnes.ac.id");
   const [adminPassword, setAdminPassword] = useState("Orbit!Kopi72#Langit9Biru");
 
+  // Helper agar navigasi internal komponen (onNavigate("location") atau onNavigate("/location")) bekerja seragam
+  const handleNavigate = (path) => {
+    if (!path) return;
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    navigate(cleanPath);
+  };
+
   return (
     <div className="App min-h-screen">
-      {/* Quick Navigation Toolbar di bagian paling atas untuk kemudahan evaluasi & preview
-      <div className="bg-slate-900 text-white text-[11px] py-1.5 px-4 flex items-center justify-between border-b border-slate-800">
-        <span className="text-slate-400 font-medium">
-          NEXUM Preview Mode:{" "}
-          <strong className="text-white capitalize">{currentPage}</strong>
-        </span>
-        <div className="flex items-center gap-1.5 overflow-x-auto">
-          <button
-            onClick={() => setCurrentPage("landing")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "landing"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            0. Landing Page
-          </button>
-          <button
-            onClick={() => setCurrentPage("login")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "login"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            1. Login
-          </button>
-          <button
-            onClick={() => setCurrentPage("register")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "register"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            2. Register
-          </button>
-          <button
-            onClick={() => setCurrentPage("dashboard")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "dashboard"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            3. Dashboard (BI)
-          </button>
-          <button
-            onClick={() => setCurrentPage("location")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "location"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            4. Kelayakan Lokasi (SAW)
-          </button>
-          <button
-            onClick={() => setCurrentPage("finance")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "finance"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            5. Risiko Keuangan (SAK EMKM)
-          </button>
-          <button
-            onClick={() => setCurrentPage("ai")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "ai"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            6. Konsultasi AI (RAG)
-          </button>
-          <button
-            onClick={() => setCurrentPage("history")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "history"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            7. Riwayat Analisis
-          </button>
-          <button
-            onClick={() => setCurrentPage("profile")}
-            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
-              currentPage === "profile"
-                ? "bg-blue-600 text-white"
-                : "text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            8. Profil Usaha
-          </button>
-        </div>
-      </div> */}
-
-      {/* Render Current Page */}
-      {currentPage === "landing" && (
-        <LandingPage
-          onNavigateToLogin={() => setCurrentPage("login")}
-          onNavigateToRegister={() => setCurrentPage("register")}
-          onNavigateToDashboard={() => setCurrentPage("dashboard")}
+      <Routes>
+        {/* ======================================================== */}
+        {/* 1. RUTE PUBLIK                                           */}
+        {/* ======================================================== */}
+        <Route
+          path="/"
+          element={
+            <LandingPage
+              onNavigateToLogin={() => navigate("/login")}
+              onNavigateToRegister={() => navigate("/register")}
+              onNavigateToDashboard={() => navigate("/dashboard")}
+            />
+          }
         />
-      )}
-
-      {currentPage === "login" && (
-        <LoginPage
-          onNavigateToRegister={() => setCurrentPage("register")}
-          onLoginSuccess={() => setCurrentPage("dashboard")}
-          onNavigateToLanding={() => setCurrentPage("landing")}
-          onAdminLogin={() => setCurrentPage("admin")}
-          adminEmail={adminEmail}
-          adminPassword={adminPassword}
+        <Route
+          path="/login"
+          element={
+            <LoginPage
+              onNavigateToRegister={() => navigate("/register")}
+              onLoginSuccess={() => navigate("/dashboard")}
+              onNavigateToLanding={() => navigate("/")}
+              onAdminLogin={() => navigate("/admin")}
+              adminEmail={adminEmail}
+              adminPassword={adminPassword}
+            />
+          }
         />
-      )}
-
-      {currentPage === "admin" && (
-        <AdminDashboardPage
-          onLogout={() => setCurrentPage("login")}
-          onSwitchToUser={() => setCurrentPage("dashboard")}
-          adminEmail={adminEmail}
-          adminPassword={adminPassword}
-          onUpdateAdminPassword={(newPass) => setAdminPassword(newPass)}
+        <Route
+          path="/register"
+          element={
+            <RegisterPage
+              onNavigateToLogin={() => navigate("/login")}
+              onNavigateToLanding={() => navigate("/")}
+            />
+          }
         />
-      )}
 
-      {currentPage === "register" && (
-        <RegisterPage
-          onNavigateToLogin={() => setCurrentPage("login")}
-          onNavigateToLanding={() => setCurrentPage("landing")}
+        {/* ======================================================== */}
+        {/* 2. RUTE PORTAL PENGGUNA (UMKM)                          */}
+        {/* ======================================================== */}
+        <Route
+          path="/dashboard"
+          element={
+            <DashboardPage
+              onLogout={() => navigate("/login")}
+              onNavigate={handleNavigate}
+            />
+          }
         />
-      )}
+        <Route
+          path="/location"
+          element={
+            <LocationPredictionPage
+              onLogout={() => navigate("/login")}
+              onNavigate={handleNavigate}
+            />
+          }
+        />
+        <Route
+          path="/finance"
+          element={
+            <FinancialRiskPage
+              onLogout={() => navigate("/login")}
+              onNavigate={handleNavigate}
+            />
+          }
+        />
+        <Route
+          path="/ai"
+          element={
+            <AiConsultingPage
+              onLogout={() => navigate("/login")}
+              onNavigate={handleNavigate}
+            />
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <AnalysisHistoryPage
+              onLogout={() => navigate("/login")}
+              onNavigate={handleNavigate}
+            />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <BusinessProfilePage
+              onLogout={() => navigate("/login")}
+              onNavigate={handleNavigate}
+            />
+          }
+        />
 
-      {currentPage === "dashboard" && (
-        <DashboardPage
-          onLogout={() => setCurrentPage("login")}
-          onNavigate={(page) => setCurrentPage(page)}
+        {/* ======================================================== */}
+        {/* 3. RUTE KHUSUS ADMINISTRATOR                             */}
+        {/* ======================================================== */}
+        <Route
+          path="/admin"
+          element={
+            <AdminDashboardPage
+              onLogout={() => navigate("/login")}
+              onSwitchToUser={() => navigate("/dashboard")}
+              adminEmail={adminEmail}
+              adminPassword={adminPassword}
+              onUpdateAdminPassword={(newPass) => setAdminPassword(newPass)}
+            />
+          }
         />
-      )}
 
-      {currentPage === "location" && (
-        <LocationPredictionPage
-          onLogout={() => setCurrentPage("login")}
-          onNavigate={(page) => setCurrentPage(page)}
-        />
-      )}
-
-      {currentPage === "finance" && (
-        <FinancialRiskPage
-          onLogout={() => setCurrentPage("login")}
-          onNavigate={(page) => setCurrentPage(page)}
-        />
-      )}
-
-      {currentPage === "ai" && (
-        <AiConsultingPage
-          onLogout={() => setCurrentPage("login")}
-          onNavigate={(page) => setCurrentPage(page)}
-        />
-      )}
-
-      {currentPage === "history" && (
-        <AnalysisHistoryPage
-          onLogout={() => setCurrentPage("login")}
-          onNavigate={(page) => setCurrentPage(page)}
-        />
-      )}
-
-      {currentPage === "profile" && (
-        <BusinessProfilePage
-          onLogout={() => setCurrentPage("login")}
-          onNavigate={(page) => setCurrentPage(page)}
-        />
-      )}
+        {/* ======================================================== */}
+        {/* 4. RUTE PENAMPUNG (SMART TYPO & AUTO-REDIRECT)           */}
+        {/* ======================================================== */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}

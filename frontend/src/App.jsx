@@ -8,10 +8,29 @@ import FinancialRiskPage from "./components/FinancialRiskPage";
 import AiConsultingPage from "./components/AIConsultingPage";
 import AnalysisHistoryPage from "./components/AnalysisHistoryPage";
 import LandingPage from "./components/LandingPage";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminMonitoringDashboard from "./pages/AdminMonitoringDashboard";
+import AdminKnowledgeBaseConfig from "./pages/AdminKnowledgeBaseConfig";
 
 function App() {
-  // Pilihan awal halaman yang ingin ditampilkan ('dashboard', 'location', 'finance', dll.)
-  const [currentPage, setCurrentPage] = useState("landing");
+  // Pilihan awal halaman: 'login', 'landing', 'dashboard', 'admin-monitoring', dll.
+  const [currentPage, setCurrentPage] = useState("login");
+  const [currentUser, setCurrentUser] = useState(null); // { email, role, name }
+
+  // Handler otomatis login sesuai role (mempermudah integrasi tim backend nanti)
+  const handleLoginSuccess = (role, userData) => {
+    setCurrentUser(userData);
+    if (role === "admin") {
+      setCurrentPage("admin-monitoring");
+    } else {
+      setCurrentPage("dashboard");
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentPage("login");
+  };
 
   return (
     <div className="App min-h-screen">
@@ -112,6 +131,26 @@ function App() {
           >
             8. Profil Usaha
           </button>
+          <button
+            onClick={() => setCurrentPage("admin-monitoring")}
+            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
+              currentPage === "admin-monitoring"
+                ? "bg-blue-600 text-white"
+                : "text-slate-300 hover:bg-slate-800"
+            }`}
+          >
+            9. Admin Monitoring
+          </button>
+          <button
+            onClick={() => setCurrentPage("admin-config")}
+            className={`px-2.5 py-0.5 rounded transition-colors whitespace-nowrap ${
+              currentPage === "admin-config"
+                ? "bg-blue-600 text-white"
+                : "text-slate-300 hover:bg-slate-800"
+            }`}
+          >
+            10. Admin Config
+          </button>
         </div>
       </div> */}
 
@@ -127,7 +166,7 @@ function App() {
       {currentPage === "login" && (
         <LoginPage
           onNavigateToRegister={() => setCurrentPage("register")}
-          onLoginSuccess={() => setCurrentPage("dashboard")}
+          onLoginSuccess={handleLoginSuccess}
           onNavigateToLanding={() => setCurrentPage("landing")}
         />
       )}
@@ -138,44 +177,75 @@ function App() {
 
       {currentPage === "dashboard" && (
         <DashboardPage
-          onLogout={() => setCurrentPage("login")}
+          onLogout={handleLogout}
           onNavigate={(page) => setCurrentPage(page)}
         />
       )}
 
       {currentPage === "location" && (
         <LocationPredictionPage
-          onLogout={() => setCurrentPage("login")}
+          onLogout={handleLogout}
           onNavigate={(page) => setCurrentPage(page)}
         />
       )}
 
       {currentPage === "finance" && (
         <FinancialRiskPage
-          onLogout={() => setCurrentPage("login")}
+          onLogout={handleLogout}
           onNavigate={(page) => setCurrentPage(page)}
         />
       )}
 
       {currentPage === "ai" && (
         <AiConsultingPage
-          onLogout={() => setCurrentPage("login")}
+          onLogout={handleLogout}
           onNavigate={(page) => setCurrentPage(page)}
         />
       )}
 
       {currentPage === "history" && (
         <AnalysisHistoryPage
-          onLogout={() => setCurrentPage("login")}
+          onLogout={handleLogout}
           onNavigate={(page) => setCurrentPage(page)}
         />
       )}
 
       {currentPage === "profile" && (
         <BusinessProfilePage
-          onLogout={() => setCurrentPage("login")}
+          onLogout={handleLogout}
           onNavigate={(page) => setCurrentPage(page)}
         />
+      )}
+
+      {/* Admin Pages */}
+      {currentPage === "admin-monitoring" && (
+        <AdminLayout
+          currentView={currentPage}
+          onNavigate={(page) => {
+            if (page === "landing" || page === "login") {
+              handleLogout();
+            } else {
+              setCurrentPage(page);
+            }
+          }}
+        >
+          <AdminMonitoringDashboard />
+        </AdminLayout>
+      )}
+
+      {currentPage === "admin-config" && (
+        <AdminLayout
+          currentView={currentPage}
+          onNavigate={(page) => {
+            if (page === "landing" || page === "login") {
+              handleLogout();
+            } else {
+              setCurrentPage(page);
+            }
+          }}
+        >
+          <AdminKnowledgeBaseConfig />
+        </AdminLayout>
       )}
     </div>
   );

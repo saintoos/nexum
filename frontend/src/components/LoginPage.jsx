@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { AtSign, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { AtSign, Lock, Eye, EyeOff, ArrowLeft, Shield, Store } from "lucide-react";
 
-export default function LoginPage() {
+export default function LoginPage({
+  onLoginSuccess,
+  onNavigateToRegister,
+  onNavigateToLanding,
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -19,11 +23,45 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
-    // Simulasi pengiriman data autentikasi ke backend API
+
+    // =========================================================================
+    // 🔌 CATATAN UNTUK TIM BACKEND:
+    // Sambungkan endpoint API login kalian di sini, contoh:
+    //
+    // try {
+    //   const response = await fetch("http://localhost:5000/api/auth/login", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ email, password })
+    //   });
+    //   const data = await response.json();
+    //   if (response.ok) {
+    //     onLoginSuccess(data.user.role, data.user); // role: 'admin' | 'umkm'
+    //   } else {
+    //     setErrorMessage(data.message || "Email atau password salah.");
+    //   }
+    // } catch (err) {
+    //   setErrorMessage("Gagal terhubung ke server backend.");
+    // }
+    // =========================================================================
+
     setTimeout(() => {
       setIsLoading(false);
-      alert(`Login berhasil untuk: ${email}`);
-    }, 1000);
+
+      // Logika Mock Frontend:
+      // Jika email mengandung "admin" -> arahkan ke Admin Control Portal
+      // Selain itu -> arahkan ke Dashboard Pelaku UMKM
+      const isEmailAdmin = email.toLowerCase().includes("admin");
+      const detectedRole = isEmailAdmin ? "admin" : "umkm";
+
+      if (onLoginSuccess) {
+        onLoginSuccess(detectedRole, {
+          email,
+          role: detectedRole,
+          name: isEmailAdmin ? "Administrator ROOT" : "Siti Rahma (UMKM Retail)",
+        });
+      }
+    }, 600);
   };
 
   const handleGoogleLogin = () => {
@@ -52,16 +90,17 @@ export default function LoginPage() {
         <div className="w-full max-w-[460px]">
           {/* Back Link */}
           <div className="mb-4">
-            <a
-              href="#beranda"
+            <button
+              type="button"
+              onClick={onNavigateToLanding}
               className="inline-flex items-center text-xs md:text-sm text-slate-600 hover:text-[#0A2540] transition-colors group font-medium"
             >
               <ArrowLeft
                 size={14}
                 className="mr-1.5 transition-transform group-hover:-translate-x-1"
               />
-              Kembali ke Beranda
-            </a>
+              Kembali ke Landing Page
+            </button>
           </div>
 
           {/* Login Card */}
@@ -71,14 +110,65 @@ export default function LoginPage() {
 
             <div className="px-6 py-8 sm:px-10 sm:py-9">
               {/* Card Header */}
-              <div className="text-center mb-7">
+              <div className="text-center mb-6">
                 <h2 className="text-xl sm:text-[22px] font-bold text-[#0A2540]">
                   Masuk ke Akun Anda
                 </h2>
                 <p className="text-xs sm:text-[13px] text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
-                  Kelola analitik keuangan dan rekomendasi ekspansi cabang
-                  secara real-time
+                  Kelola analitik keuangan dan rekomendasi ekspansi cabang secara real-time
                 </p>
+              </div>
+
+              {/* Quick Demo Role Selector (Mempermudah Evaluasi & Testing) */}
+              <div className="mb-5 p-3 bg-[#FAF8FF] border border-blue-100 rounded-xl text-left">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold text-[#00236F] uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    Demo Cepat Role Akun
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    Klik untuk mengisi
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {/* UMKM Preset */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail("siti.rahma@berkahretail.id");
+                      setPassword("PasswordUMKM2026!");
+                    }}
+                    className="p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 transition-all text-left group shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-800 group-hover:text-blue-700">
+                      <span className="flex items-center gap-1">
+                        <Store className="w-3 h-3 text-blue-600" />
+                        Akun UMKM
+                      </span>
+                      <span className="text-[9px] px-1 py-0.2 bg-emerald-100 text-emerald-800 rounded font-semibold">User</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 truncate mt-0.5 font-mono">siti.rahma@retail.id</p>
+                  </button>
+
+                  {/* Admin Preset */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail("admin@nexum.id");
+                      setPassword("SuperAdmin2026!");
+                    }}
+                    className="p-2 rounded-lg bg-white border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/40 transition-all text-left group shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-800 group-hover:text-indigo-700">
+                      <span className="flex items-center gap-1">
+                        <Shield className="w-3 h-3 text-indigo-600" />
+                        Akun Admin
+                      </span>
+                      <span className="text-[9px] px-1 py-0.2 bg-indigo-100 text-indigo-800 rounded font-semibold font-mono">ROOT</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 truncate mt-0.5 font-mono">admin@nexum.id</p>
+                  </button>
+                </div>
               </div>
 
               {/* Error Message Alert */}
@@ -107,7 +197,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="nama@usaha.com"
+                      placeholder="nama@usaha.com atau admin@nexum.id"
                       required
                       className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none rounded-lg"
                     />
@@ -139,9 +229,7 @@ export default function LoginPage() {
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="pr-3.5 pl-1 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
-                      title={
-                        showPassword ? "Sembunyikan sandi" : "Tampilkan sandi"
-                      }
+                      title={showPassword ? "Sembunyikan sandi" : "Tampilkan sandi"}
                       aria-label="Toggle password visibility"
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -197,10 +285,10 @@ export default function LoginPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
                       </svg>
-                      Memproses...
+                      Memverifikasi kredensial...
                     </span>
                   ) : (
-                    "Masuk"
+                    "Masuk ke Platform"
                   )}
                 </button>
               </form>
@@ -260,12 +348,13 @@ export default function LoginPage() {
               {/* Bottom Register Option */}
               <div className="text-center text-xs text-slate-600 mt-7">
                 Belum memiliki akun Pelaku UMKM?{" "}
-                <a
-                  href="#daftar"
-                  className="text-blue-700 hover:text-blue-800 font-semibold underline underline-offset-2 transition-colors"
+                <button
+                  type="button"
+                  onClick={onNavigateToRegister}
+                  className="text-blue-700 hover:text-blue-800 font-semibold underline underline-offset-2 transition-colors cursor-pointer"
                 >
                   Daftar akun baru
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -280,8 +369,7 @@ export default function LoginPage() {
         <div className="py-4 px-4 text-center">
           <p className="text-[11px] sm:text-xs text-slate-500 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
             <span>
-              © 2025 NEXUM Intelligence Platform. Institutional Enterprise
-              Grade.
+              © 2026 NEXUM Intelligence Platform. Institutional Enterprise Grade.
             </span>
             <span className="text-slate-400">•</span>
             <a

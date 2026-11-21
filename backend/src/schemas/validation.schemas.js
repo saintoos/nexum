@@ -31,7 +31,7 @@ const registerSchema = z.object({
   sector: z
     .string()
     .trim()
-    .max(100, "Sektor usaha maksimal 100 karakter")
+    .max(255, "Sektor usaha maksimal 255 karakter")
     .optional(),
 });
 

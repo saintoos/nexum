@@ -11,7 +11,6 @@ import {
   Search,
   Bell,
   FileSpreadsheet,
-  Download,
   UploadCloud,
   AlertTriangle,
   FileText,
@@ -87,12 +86,6 @@ export default function FinancialRiskPage({ onLogout, onNavigate }) {
 
   const handleRemoveFile = () => {
     setFileName("");
-  };
-
-  const handleDownloadTemplate = () => {
-    alert(
-      "Mengunduh template pembukuan standar: NEXUM_Template_Keuangan_SAK_EMKM.xlsx",
-    );
   };
 
   return (
@@ -182,21 +175,12 @@ export default function FinancialRiskPage({ onLogout, onNavigate }) {
                     )}
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Gunakan template resmi NEXUM (.xlsx). Maksimal ukuran berkas 5 MB (in-memory safe).
+                    Format berkas yang didukung (.xlsx, .xls). Maksimal ukuran berkas 5 MB (in-memory safe).
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto shrink-0">
-                <button
-                  type="button"
-                  onClick={handleDownloadTemplate}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs text-blue-700 hover:text-blue-900 font-semibold py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  <Download size={14} />
-                  <span>Unduh Template Excel Standar</span>
-                </button>
-
+              <div className="flex items-center gap-2.5 w-full md:w-auto shrink-0">
                 <label className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-[#0A2540] hover:bg-[#071c33] active:scale-[0.99] text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm cursor-pointer transition-all">
                   <UploadCloud size={15} />
                   <span>

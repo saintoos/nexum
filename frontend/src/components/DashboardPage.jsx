@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   Lock,
   ArrowRight,
-  Download,
   Building,
 } from "lucide-react";
 
@@ -518,16 +517,11 @@ export default function DashboardPage({ onLogout, onNavigate }) {
               <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
                 <button
                   type="button"
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors"
-                >
-                  <Download size={13} />
-                  <span>Panduan Format Excel (.xlsx)</span>
-                </button>
-                <button
-                  type="button"
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-[#0A2540] hover:bg-[#071c33] active:scale-[0.99] text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-all"
+                  onClick={() => handleMenuClick("lokasi")}
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-[#0A2540] hover:bg-[#071c33] active:scale-[0.99] text-white text-xs font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-all"
                 >
                   <span>Mulai Simulasi Lokasi</span>
+                  <ArrowRight size={14} />
                 </button>
               </div>
             </div>

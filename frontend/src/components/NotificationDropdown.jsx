@@ -119,6 +119,17 @@ export default function NotificationDropdown({ onNavigate }) {
     setNotifications((prev) => prev.filter((n) => n.unread));
   };
 
+  // Handler: Hapus satu notifikasi secara permanen
+  const deleteNotification = (id, e) => {
+    e?.stopPropagation();
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  // Handler: Hapus semua notifikasi
+  const deleteAllNotifications = () => {
+    setNotifications([]);
+  };
+
   // Handler: Klik notifikasi untuk navigasi ke halaman terkait
   const handleItemClick = (item) => {
     markAsRead(item.id);
@@ -311,9 +322,19 @@ export default function NotificationDropdown({ onNavigate }) {
                       >
                         {item.title}
                       </h4>
-                      {item.unread && (
-                        <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0 mt-1"></span>
-                      )}
+                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                        {item.unread && (
+                          <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => deleteNotification(item.id, e)}
+                          className="p-1 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Hapus notifikasi ini"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
                     </div>
 
                     <p className="text-[11px] text-slate-500 mt-1 leading-relaxed line-clamp-2">
@@ -341,18 +362,33 @@ export default function NotificationDropdown({ onNavigate }) {
 
           {/* Footer Popover */}
           <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px]">
-            <button
-              type="button"
-              onClick={clearReadNotifications}
-              className="text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors px-2 py-1 rounded"
-              title="Bersihkan notifikasi yang sudah dibaca"
-            >
-              <Trash2 size={12} />
-              <span>Bersihkan yang terbaca</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={clearReadNotifications}
+                className="text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors px-1.5 py-0.5 rounded hover:bg-slate-200/60"
+                title="Bersihkan notifikasi yang sudah dibaca"
+              >
+                <span>Hapus Terbaca</span>
+              </button>
+              {notifications.length > 0 && (
+                <>
+                  <span className="text-slate-300">|</span>
+                  <button
+                    type="button"
+                    onClick={deleteAllNotifications}
+                    className="text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors px-1.5 py-0.5 rounded hover:bg-red-50 font-medium"
+                    title="Hapus seluruh notifikasi"
+                  >
+                    <Trash2 size={11} />
+                    <span>Hapus Semua</span>
+                  </button>
+                </>
+              )}
+            </div>
 
-            <span className="text-[10px] text-slate-400 font-medium px-2">
-              NEXUM Real-Time Intel
+            <span className="text-[10px] text-slate-400 font-medium px-1">
+              NEXUM Notifikasi
             </span>
           </div>
         </div>

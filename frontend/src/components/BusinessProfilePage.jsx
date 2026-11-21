@@ -31,12 +31,31 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
     businessName: "Warung Rahma",
     tradeMark: "Ritel F&B",
     sector: "Kuliner & Restoran Cepat Saji",
+    customSector: "",
     scale: "Mikro - < Rp 50 Juta / bulan",
     nib: "9120003482104",
-    establishedYear: "2021 (3 Tahun Beroperasi)",
+    establishedDate: "2021-08-15",
     address: "Jl. Gajah Mada No. 45, Kota Semarang, Jawa Tengah",
     coordinates: "-6.9811, 110.4219",
   });
+
+  // Menghitung estimasi usia operasional usaha secara dinamis
+  const calculateBusinessAge = (dateStr) => {
+    if (!dateStr) return "";
+    const startDate = new Date(dateStr);
+    if (isNaN(startDate.getTime())) return "";
+    const today = new Date();
+    let years = today.getFullYear() - startDate.getFullYear();
+    let months = today.getMonth() - startDate.getMonth();
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    if (years <= 0 && months <= 0) return "Baru dirintis (< 1 bulan)";
+    if (years <= 0) return `~${months} bulan beroperasi`;
+    if (months === 0) return `~${years} tahun beroperasi`;
+    return `~${years} thn ${months} bln beroperasi`;
+  };
 
   const [activeMenu, setActiveMenu] = useState("profil");
   const [isCopied, setIsCopied] = useState(false);
@@ -98,11 +117,10 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                 <button
                   key={item.id}
                   onClick={() => handleMenuClick(item.id)}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                    isActive
-                      ? "bg-[#EEF4FF] text-[#0A2540] font-semibold shadow-sm"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${isActive
+                    ? "bg-[#EEF4FF] text-[#0A2540] font-semibold shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
                 >
                   <Icon
                     size={17}
@@ -222,18 +240,72 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                                 sector: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none appearance-none cursor-pointer"
+                            className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none appearance-none cursor-pointer pr-8"
                           >
-                            <option>Kuliner & Restoran Cepat Saji</option>
-                            <option>Ritel & Perdagangan Grosir</option>
-                            <option>Jasa & Hospitality</option>
-                            <option>Produksi & Manufaktur Rumahan</option>
+                            <option value="Kuliner & Restoran Cepat Saji">
+                              Kuliner & Restoran Cepat Saji (F&B)
+                            </option>
+                            <option value="Ritel & Perdagangan Grosir">
+                              Ritel & Perdagangan Grosir
+                            </option>
+                            <option value="Fesyen & Tekstil">
+                              Fesyen & Tekstil
+                            </option>
+                            <option value="Kesehatan, Kecantikan & Perawatan">
+                              Kesehatan, Kecantikan & Perawatan
+                            </option>
+                            <option value="Agribisnis, Pertanian & Peternakan">
+                              Agribisnis, Pertanian & Peternakan
+                            </option>
+                            <option value="Teknologi, Digital & Kreatif">
+                              Teknologi, Digital & Kreatif
+                            </option>
+                            <option value="Otomotif & Bengkel">
+                              Otomotif & Bengkel
+                            </option>
+                            <option value="Pendidikan & Pelatihan">
+                              Pendidikan & Pelatihan (bimbel, kursus, les privat, perlengkapan belajar)
+                            </option>
+                            <option value="Jasa & Hospitality">
+                              Jasa & Hospitality
+                            </option>
+                            <option value="Produksi & Manufaktur Rumahan">
+                              Produksi & Manufaktur Rumahan
+                            </option>
+                            <option value="Lainnya">
+                              Lainnya (Tuliskan Sektor Manual)
+                            </option>
                           </select>
                           <ChevronDown
                             size={16}
                             className="absolute right-3 text-slate-400 pointer-events-none"
                           />
                         </div>
+
+                        {/* Input Teks Manual Jika Memilih 'Lainnya' */}
+                        {formData.sector === "Lainnya" && (
+                          <div className="mt-2.5 animate-in fade-in duration-200">
+                            <label className="block text-[11px] font-semibold text-blue-900 mb-1">
+                              Tuliskan Sektor Usaha Anda <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={formData.customSector}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  customSector: e.target.value,
+                                })
+                              }
+                              placeholder="Contoh: Kerajinan Tangan, Pengolahan Limbah, Ekspedisi..."
+                              className="w-full bg-[#F1F4F9] border border-blue-300 focus:border-blue-500 focus:bg-white px-3 py-2 rounded-lg text-xs outline-none transition-all font-medium text-slate-800"
+                            />
+                            <p className="text-[10px] text-slate-500 mt-1">
+                              Kategori manual ini akan disimpan dan disesuaikan untuk konteks analisis.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Skala Modal */}
@@ -301,27 +373,38 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                         </div>
                       </div>
 
-                      {/* Tahun Berdiri */}
+                      {/* Tanggal Berdiri Usaha (Interaktif Date Picker) */}
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                          Tahun Berdiri & Riwayat
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-semibold text-slate-700">
+                            Tanggal Berdiri & Mulai Operasi <span className="text-red-500">*</span>
+                          </label>
+                          {formData.establishedDate && (
+                            <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded">
+                              {calculateBusinessAge(formData.establishedDate)}
+                            </span>
+                          )}
+                        </div>
                         <div className="relative flex items-center bg-[#F1F4F9] rounded-lg border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all">
-                          <div className="pl-3.5 pr-1 text-slate-400">
+                          <div className="pl-3.5 pr-1 text-slate-400 pointer-events-none">
                             <Calendar size={16} />
                           </div>
                           <input
-                            type="text"
-                            value={formData.establishedYear}
+                            type="date"
+                            max={new Date().toISOString().split("T")[0]}
+                            value={formData.establishedDate}
                             onChange={(e) =>
                               setFormData({
                                 ...formData,
-                                establishedYear: e.target.value,
+                                establishedDate: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none"
+                            className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none cursor-pointer font-medium"
                           />
                         </div>
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Pilih tanggal pendirian usaha melalui kalender interaktif.
+                        </p>
                       </div>
                     </div>
 

@@ -15,24 +15,172 @@ import {
   ArrowRight,
   Info,
   BarChart2,
-  Navigation,
+  ChevronDown,
+  Building2,
+  Compass,
+  CheckCircle2,
 } from "lucide-react";
+
+// Master Data Wilayah Pulau Jawa (6 Provinsi dan Daftar Kota/Kabupaten)
+const JAVA_REGIONS = {
+  "Banten": [
+    "Kota Cilegon",
+    "Kota Serang",
+    "Kota Tangerang",
+    "Kota Tangerang Selatan",
+    "Kabupaten Lebak",
+    "Kabupaten Pandeglang",
+    "Kabupaten Serang",
+    "Kabupaten Tangerang",
+  ],
+  "DKI Jakarta": [
+    "Kota Jakarta Pusat",
+    "Kota Jakarta Barat",
+    "Kota Jakarta Selatan",
+    "Kota Jakarta Timur",
+    "Kota Jakarta Utara",
+    "Kabupaten Kepulauan Seribu",
+  ],
+  "Jawa Barat": [
+    "Kota Bandung",
+    "Kota Banjar",
+    "Kota Bekasi",
+    "Kota Bogor",
+    "Kota Cimahi",
+    "Kota Cirebon",
+    "Kota Depok",
+    "Kota Sukabumi",
+    "Kota Tasikmalaya",
+    "Kabupaten Bandung",
+    "Kabupaten Bandung Barat",
+    "Kabupaten Bekasi",
+    "Kabupaten Bogor",
+    "Kabupaten Ciamis",
+    "Kabupaten Cianjur",
+    "Kabupaten Cirebon",
+    "Kabupaten Garut",
+    "Kabupaten Indramayu",
+    "Kabupaten Karawang",
+    "Kabupaten Kuningan",
+    "Kabupaten Majalengka",
+    "Kabupaten Pangandaran",
+    "Kabupaten Purwakarta",
+    "Kabupaten Subang",
+    "Kabupaten Sukabumi",
+    "Kabupaten Sumedang",
+    "Kabupaten Tasikmalaya",
+  ],
+  "Jawa Tengah": [
+    "Kota Semarang",
+    "Kota Magelang",
+    "Kota Pekalongan",
+    "Kota Salatiga",
+    "Kota Surakarta (Solo)",
+    "Kota Tegal",
+    "Kabupaten Banjarnegara",
+    "Kabupaten Banyumas",
+    "Kabupaten Batang",
+    "Kabupaten Blora",
+    "Kabupaten Boyolali",
+    "Kabupaten Brebes",
+    "Kabupaten Cilacap",
+    "Kabupaten Demak",
+    "Kabupaten Grobogan",
+    "Kabupaten Jepara",
+    "Kabupaten Karanganyar",
+    "Kabupaten Kebumen",
+    "Kabupaten Kendal",
+    "Kabupaten Klaten",
+    "Kabupaten Kudus",
+    "Kabupaten Magelang",
+    "Kabupaten Pati",
+    "Kabupaten Pekalongan",
+    "Kabupaten Pemalang",
+    "Kabupaten Purbalingga",
+    "Kabupaten Purworejo",
+    "Kabupaten Rembang",
+    "Kabupaten Semarang",
+    "Kabupaten Sragen",
+    "Kabupaten Sukoharjo",
+    "Kabupaten Tegal",
+    "Kabupaten Temanggung",
+    "Kabupaten Wonogiri",
+    "Kabupaten Wonosobo",
+  ],
+  "DI Yogyakarta": [
+    "Kota Yogyakarta",
+    "Kabupaten Bantul",
+    "Kabupaten Gunungkidul",
+    "Kabupaten Kulon Progo",
+    "Kabupaten Sleman",
+  ],
+  "Jawa Timur": [
+    "Kota Surabaya",
+    "Kota Batu",
+    "Kota Blitar",
+    "Kota Kediri",
+    "Kota Madiun",
+    "Kota Malang",
+    "Kota Mojokerto",
+    "Kota Pasuruan",
+    "Kota Probolinggo",
+    "Kabupaten Bangkalan",
+    "Kabupaten Banyuwangi",
+    "Kabupaten Blitar",
+    "Kabupaten Bojonegoro",
+    "Kabupaten Bondowoso",
+    "Kabupaten Gresik",
+    "Kabupaten Jember",
+    "Kabupaten Jombang",
+    "Kabupaten Kediri",
+    "Kabupaten Lamongan",
+    "Kabupaten Lumajang",
+    "Kabupaten Madiun",
+    "Kabupaten Magetan",
+    "Kabupaten Malang",
+    "Kabupaten Mojokerto",
+    "Kabupaten Nganjuk",
+    "Kabupaten Ngawi",
+    "Kabupaten Pacitan",
+    "Kabupaten Pamekasan",
+    "Kabupaten Pasuruan",
+    "Kabupaten Ponorogo",
+    "Kabupaten Probolinggo",
+    "Kabupaten Sampang",
+    "Kabupaten Sidoarjo",
+    "Kabupaten Situbondo",
+    "Kabupaten Sumenep",
+    "Kabupaten Trenggalek",
+    "Kabupaten Tuban",
+    "Kabupaten Tulungagung",
+  ],
+};
 
 export default function LocationPredictionPage({ onLogout, onNavigate }) {
   const [activeMenu, setActiveMenu] = useState("lokasi");
 
-  // State Input Parameter
+  // State Zonasi Wilayah (Pulau Jawa)
+  const [selectedProvince, setSelectedProvince] = useState("Jawa Tengah");
+  const [selectedCity, setSelectedCity] = useState("Kota Semarang");
+  const [districtOrArea, setDistrictOrArea] = useState(
+    "Kawasan Simpang Lima / Pandanaran"
+  );
+
+  // State Input Parameter SAW
   const [rentCost, setRentCost] = useState("4500000");
   const [competitors, setCompetitors] = useState("3");
   const [accessibility, setAccessibility] = useState("4");
   const [marketPotential, setMarketPotential] = useState("3");
-  const [coordinates, setCoordinates] = useState({
-    lat: -6.9932,
-    lng: 110.4203,
-    address: "Jl. Pandanaran No. 12, Semarang Tengah",
-  });
 
   const [isSaved, setIsSaved] = useState(false);
+
+  // Ganti provinsi & otomatis set kota pertama di provinsi tersebut
+  const handleProvinceChange = (e) => {
+    const prov = e.target.value;
+    setSelectedProvince(prov);
+    const cities = JAVA_REGIONS[prov] || [];
+    setSelectedCity(cities[0] || "");
+  };
 
   // Bobot SAW: Biaya Sewa 30%, Kompetitor 25%, Aksesibilitas 20%, Potensi Pasar 25%
   const calculateSaw = () => {
@@ -68,11 +216,9 @@ export default function LocationPredictionPage({ onLogout, onNavigate }) {
   const sawResult = calculateSaw();
 
   const handleUseSample = () => {
-    setCoordinates({
-      lat: -6.9932,
-      lng: 110.4203,
-      address: "Jl. Pandanaran No. 12, Semarang Tengah",
-    });
+    setSelectedProvince("Jawa Tengah");
+    setSelectedCity("Kota Semarang");
+    setDistrictOrArea("Kawasan Simpang Lima / Pandanaran");
     setRentCost("4500000");
     setCompetitors("3");
     setAccessibility("4");
@@ -165,14 +311,14 @@ export default function LocationPredictionPage({ onLogout, onNavigate }) {
                 Prediksi Kelayakan Lokasi Cabang
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
-                Penilaian lokasi multi-kriteria berbasis input koordinat manual
-                Google Maps dan normalisasi 4 indikator empiris UMKM
+                Penilaian kelayakan lokasi multi-kriteria berbasis zonasi wilayah Pulau Jawa
+                dan normalisasi 4 indikator empiris UMKM (Metode Simple Additive Weighting)
               </p>
             </div>
 
             {/* 2 COLUMNS GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* LEFT COLUMN: PARAMETER INPUT & KOORDINAT */}
+              {/* LEFT COLUMN: PARAMETER INPUT & ZONASI WILAYAH */}
               <div className="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-5 sm:p-6 shadow-sm space-y-5">
                 {/* Section Header */}
                 <div className="flex items-start gap-3 pb-3 border-b border-slate-100">
@@ -181,37 +327,101 @@ export default function LocationPredictionPage({ onLogout, onNavigate }) {
                   </div>
                   <div>
                     <h2 className="text-sm sm:text-base font-bold text-slate-900">
-                      Parameter Input & Koordinat
+                      Zonasi Wilayah & Parameter Input
                     </h2>
                     <p className="text-[11px] sm:text-xs text-slate-500">
-                      Data titik gerai target ekspansi
+                      Pilih provinsi dan kota/kabupaten di Pulau Jawa untuk target ekspansi
                     </p>
                   </div>
                 </div>
 
-                {/* Sub-section 1: Koordinat Geografis */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                    <span>🎯 Koordinat Geografis (Google Maps)</span>
+                {/* Sub-section 1: Pemilihan Wilayah (Pulau Jawa) */}
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                      <Compass size={15} className="text-blue-600" />
+                      <span>Wilayah Administratif (Pulau Jawa)</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleUseSample}
+                      className="text-[11px] text-blue-700 hover:text-blue-800 font-semibold hover:underline"
+                    >
+                      Reset ke Sampel
+                    </button>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Buka Google Maps, klik kanan titik lokasi ruko/gerai target,
-                    pilih koordinat untuk menyalin ke clipboard
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleUseSample}
-                    className="text-xs text-blue-700 hover:text-blue-800 font-semibold hover:underline flex items-center gap-1 pt-1"
-                  >
-                    <span>
-                      🎯 Gunakan Koordinat Sampel Semarang Tengah
-                      (Jl.Pandanaran)
-                    </span>
-                  </button>
+
+                  {/* Pilihan Provinsi */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      Provinsi (Pulau Jawa) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative flex items-center bg-[#F1F4F9] rounded-lg border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all">
+                      <div className="pl-3.5 pr-1 text-slate-400">
+                        <Building2 size={16} />
+                      </div>
+                      <select
+                        value={selectedProvince}
+                        onChange={handleProvinceChange}
+                        className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none cursor-pointer font-medium appearance-none pr-8"
+                      >
+                        {Object.keys(JAVA_REGIONS).map((prov) => (
+                          <option key={prov} value={prov}>
+                            {prov}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3 text-slate-400 pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Pilihan Kota / Kabupaten (Dinamis berdasarkan Provinsi) */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      Kota / Kabupaten <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative flex items-center bg-[#F1F4F9] rounded-lg border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all">
+                      <div className="pl-3.5 pr-1 text-slate-400">
+                        <MapPin size={16} />
+                      </div>
+                      <select
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none cursor-pointer font-medium appearance-none pr-8"
+                      >
+                        {(JAVA_REGIONS[selectedProvince] || []).map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3 text-slate-400 pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Kawasan Spesifik / Nama Jalan */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      Kawasan Spesifik / Nama Jalan / Titik Gerai (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={districtOrArea}
+                      onChange={(e) => setDistrictOrArea(e.target.value)}
+                      placeholder="Contoh: Kawasan Simpang Lima, Jl. Pandanaran, Ruko Dago..."
+                      className="w-full bg-[#F1F4F9] border border-transparent focus:border-blue-500 focus:bg-white px-3 py-2.5 rounded-lg text-xs sm:text-sm outline-none text-slate-800"
+                    />
+                  </div>
                 </div>
 
                 {/* Sub-section 2: Indikator Pendukung Lokasi (Kriteria SAW) */}
-                <div className="pt-2 border-t border-slate-100 space-y-4">
+                <div className="pt-3 border-t border-slate-100 space-y-4">
                   <div>
                     <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
                       <span>🎛️ Indikator Pendukung Lokasi (Kriteria SAW)</span>
@@ -358,138 +568,61 @@ export default function LocationPredictionPage({ onLogout, onNavigate }) {
                 </div>
               </div>
 
-              {/* RIGHT COLUMN: MAP PREVIEW & HASIL KALKULASI SAW */}
+              {/* RIGHT COLUMN: RINGKASAN WILAYAH & HASIL KALKULASI SAW */}
               <div className="lg:col-span-6 space-y-6">
-                {/* 1. Pratinjau Koordinat Peta */}
-                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-3">
-                  <div className="flex items-center justify-between">
+                {/* 1. Ringkasan Wilayah Target Ekspansi (Pengganti Peta & Koordinat) */}
+                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-2">
                       <MapPin size={16} className="text-[#0A2540]" />
                       <h3 className="text-xs sm:text-sm font-bold text-slate-900">
-                        Pratinjau Koordinat Peta
+                        Wilayah Target Ekspansi Terpilih
                       </h3>
                     </div>
-                    <span className="bg-blue-50 text-blue-700 text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-md">
-                      OpenStreetMap Live Tile
+                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                      <CheckCircle2 size={11} className="text-emerald-600" />
+                      Zonasi Pulau Jawa
                     </span>
                   </div>
 
-                  {/* Styled Map Container */}
-                  <div className="relative w-full h-48 sm:h-52 rounded-xl overflow-hidden border border-slate-200 bg-[#E8EDF5] flex items-center justify-center shadow-inner">
-                    <svg
-                      className="w-full h-full object-cover opacity-80"
-                      viewBox="0 0 500 240"
-                    >
-                      <rect width="500" height="240" fill="#E5ECF6" />
-                      <path
-                        d="M-20,60 Q120,40 260,80 T520,70"
-                        stroke="#CBD5E1"
-                        strokeWidth="8"
-                        fill="none"
-                      />
-                      <path
-                        d="M-10,180 Q180,160 320,190 T520,160"
-                        stroke="#CBD5E1"
-                        strokeWidth="7"
-                        fill="none"
-                      />
-                      <path
-                        d="M120,-10 Q140,120 180,260"
-                        stroke="#CBD5E1"
-                        strokeWidth="6"
-                        fill="none"
-                      />
-                      <path
-                        d="M360,-10 Q340,110 380,260"
-                        stroke="#CBD5E1"
-                        strokeWidth="6"
-                        fill="none"
-                      />
-                      <path
-                        d="M40,220 L460,30"
-                        stroke="#93C5FD"
-                        strokeWidth="5"
-                        fill="none"
-                      />
-                      <circle
-                        cx="260"
-                        cy="90"
-                        r="14"
-                        fill="#3B82F6"
-                        opacity="0.3"
-                      />
-                      <text
-                        x="260"
-                        y="93"
-                        fontSize="11"
-                        fontWeight="bold"
-                        fill="#1E3A8A"
-                        textAnchor="middle"
-                      >
-                        Semarang
-                      </text>
-                      <text
-                        x="380"
-                        y="60"
-                        fontSize="9"
-                        fill="#64748B"
-                        textAnchor="middle"
-                      >
-                        Masjid Agung Jawa Tengah
-                      </text>
-                      <text
-                        x="140"
-                        y="80"
-                        fontSize="9"
-                        fill="#64748B"
-                        textAnchor="middle"
-                      >
-                        Simpang Lima
-                      </text>
-                    </svg>
-
-                    {/* Central Target Pin Bubble */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                      <div className="bg-[#0A2540] text-white text-[11px] font-bold py-1.5 px-3 rounded-full shadow-lg flex items-center gap-1.5 whitespace-nowrap border border-white/20">
-                        <MapPin size={12} className="text-sky-400" />
-                        <span>
-                          Lokasi Evaluasi: Jl. Pandanaran No. 12 (-6.9932,
-                          110.4203)
+                  {/* Detail Box Wilayah */}
+                  <div className="bg-[#F8FAFD] border border-slate-200/70 rounded-xl p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">
+                          Provinsi
+                        </span>
+                        <span className="font-extrabold text-slate-900 text-sm">
+                          {selectedProvince}
                         </span>
                       </div>
-                      <div className="w-2.5 h-2.5 bg-[#0A2540] rotate-45 -mt-1 shadow-md"></div>
-                      <div className="w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-md animate-ping mt-1"></div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">
+                          Kota / Kabupaten
+                        </span>
+                        <span className="font-extrabold text-blue-700 text-sm">
+                          {selectedCity}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Coordinates Overlay Bottom Left */}
-                    <div className="absolute bottom-2.5 left-2.5 bg-white/95 backdrop-blur-sm border border-slate-200/90 rounded-md py-1 px-2.5 text-[10px] font-mono text-slate-700 shadow-sm flex items-center gap-1.5">
-                      <Navigation size={11} className="text-blue-600" />
-                      <span>
-                        LAT: {coordinates.lat.toFixed(6)} | LNG:{" "}
-                        {coordinates.lng.toFixed(6)}
-                      </span>
-                    </div>
-
-                    {/* Zoom Buttons Bottom Right */}
-                    <div className="absolute bottom-2.5 right-2.5 flex flex-col gap-1">
-                      <button className="w-6 h-6 bg-white/90 hover:bg-white rounded border border-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs shadow-sm">
-                        +
-                      </button>
-                      <button className="w-6 h-6 bg-white/90 hover:bg-white rounded border border-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs shadow-sm">
-                        -
-                      </button>
-                    </div>
+                    {districtOrArea && (
+                      <div className="pt-2.5 border-t border-slate-200/60 text-xs">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">
+                          Kawasan / Titik Gerai
+                        </span>
+                        <span className="font-medium text-slate-700">
+                          {districtOrArea}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Footnote */}
-                  <p className="text-[11px] text-slate-400 leading-relaxed flex items-start gap-1.5">
-                    <Info
-                      size={13}
-                      className="shrink-0 mt-0.5 text-slate-400"
-                    />
+                  <p className="text-[11px] text-slate-500 leading-relaxed flex items-start gap-1.5">
+                    <Info size={13} className="shrink-0 mt-0.5 text-blue-600" />
                     <span>
-                      Pratinjau visual koordinat (Peta bersifat preview;
-                      perhitungan tetap valid jika peta gagal memuat)
+                      Wilayah terpilih akan digunakan sebagai acuan penetapan matriks
+                      kelayakan lokasi cabang melalui pembobotan 4 kriteria empiris SAW di bawah.
                     </span>
                   </p>
                 </div>

@@ -12,6 +12,9 @@ const userRepository = {
   async create(data, tx = prisma) {
     return tx.user.create({
       data,
+      include: {
+        businessProfile: true,
+      },
     });
   },
 
@@ -27,6 +30,17 @@ const userRepository = {
       include: {
         businessProfile: includeProfile,
       },
+    });
+  },
+
+  /**
+   * Mencari user berdasarkan name
+   * @param {string} name
+   * @param {Object} [tx]
+   */
+  async findByName(name, tx = prisma) {
+    return tx.user.findUnique({
+      where: { name },
     });
   },
 

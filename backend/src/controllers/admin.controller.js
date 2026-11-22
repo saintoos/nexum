@@ -1,21 +1,75 @@
-const getAllUsers = (req, res, next) => {
-  res.status(501).json({ message: "Route GET /api/admin/users ready - controller pending" });
+const { adminService } = require("../services");
+
+/**
+ * Controller untuk menangani endpoint administrasi sistem
+ */
+
+const getAllUsers = async (req, res, next) => {
+  try {
+    const result = await adminService.getUsers(req.query);
+    res.status(200).json({
+      success: true,
+      message: "Daftar pengguna berhasil diambil.",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const changeUserStatus = (req, res, next) => {
-  res.status(501).json({ message: "Route PATCH /api/admin/users/:id/status ready - controller pending" });
+const changeUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    const updatedUser = await adminService.changeUserStatus(id, isActive, req.user);
+    res.status(200).json({
+      success: true,
+      message: `Status akun pengguna berhasil diperbarui menjadi ${isActive ? "aktif" : "nonaktif"}.`,
+      data: { user: updatedUser },
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const deleteUser = (req, res, next) => {
-  res.status(501).json({ message: "Route DELETE /api/admin/users/:id ready - controller pending" });
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await adminService.deleteUser(id, req.user);
+    res.status(200).json({
+      success: true,
+      message: "Akun pengguna beserta seluruh data relasi berhasil dihapus.",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const getStatistics = (req, res, next) => {
-  res.status(501).json({ message: "Route GET /api/admin/statistics ready - controller pending" });
+const getStatistics = async (req, res, next) => {
+  try {
+    const statistics = await adminService.getStatistics();
+    res.status(200).json({
+      success: true,
+      message: "Statistik platform NEXUM berhasil diambil.",
+      data: statistics,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const getSystemStatus = (req, res, next) => {
-  res.status(501).json({ message: "Route GET /api/admin/system-status ready - controller pending" });
+const getSystemStatus = async (req, res, next) => {
+  try {
+    const status = await adminService.getSystemStatus();
+    res.status(200).json({
+      success: true,
+      message: "Status operasional sistem berhasil diambil.",
+      data: status,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {

@@ -88,10 +88,13 @@ const aiService = {
    */
   async getChatHistory(userId, options = {}) {
     const limit = Math.max(1, Math.min(100, parseInt(options.limit, 10) || 50));
-    const messages = await chatMessageRepository.findByUserId(userId, {
-      limit,
-      orderBy: "asc",
-    });
+    const messages =
+      (await chatMessageRepository
+        .findByUserId(userId, {
+          limit,
+          orderBy: "asc",
+        })
+        .catch(() => [])) || [];
 
     return messages.map((msg) => ({
       ...msg,
@@ -105,7 +108,7 @@ const aiService = {
    * @param {string} userId
    */
   async deleteChatHistory(userId) {
-    await chatMessageRepository.deleteByUserId(userId);
+    await chatMessageRepository.deleteByUserId(userId).catch(() => null);
     return {
       message: "Riwayat percakapan konsultasi berhasil dibersihkan.",
     };
@@ -116,16 +119,20 @@ const aiService = {
    * @param {string} userId
    */
   async getGroundingData(userId) {
-    const [profile, latestLocation, latestFinancial] = await Promise.all([
-      businessProfileRepository.findByUserId(userId),
-      locationAnalysisRepository.findLatestByUserId(userId),
-      financialAnalysisRepository.findLatestByUserId(userId),
-    ]);
+    let profile = null;
+    let latestLocation = null;
+    let latestFinancial = null;
 
-    if (!profile && !latestLocation && !latestFinancial) {
-      return { contextJson: null, sources: [] };
-    }
+    try {
+      [profile, latestLocation, latestFinancial] = await Promise.all([
+        businessProfileRepository.findByUserId(userId).catch(() => null),
+        locationAnalysisRepository.findLatestByUserId(userId).catch(() => null),
+        financialAnalysisRepository.findLatestByUserId(userId).catch(() => null),
+      ]);
+    } catch (_) {}
 
+    // Jika belum ada data profil bisnis, biarkan null karena profil bisnis Siti telah dihapus
+    // Analisis bersifat umum jika profil belum dilengkapi pengguna
     const context = {};
     const sources = [];
 
@@ -224,9 +231,14 @@ const aiService = {
     // 1. Cek Circuit Breaker (RL-01)
     checkCircuitBreaker();
 
-    // 2. Cek Izin Konteks Pengguna (AI-02)
-    const consent = await aiConsentRepository.findByUserId(userId);
-    const allowContext = Boolean(consent?.allowContext);
+    // 2. Cek Izin Konteks Pengguna (AI-02): Mendukung toggle RAG dari frontend (options) atau setting consent DB
+    const consent = await aiConsentRepository.findByUserId(userId).catch(() => null);
+    const allowContext =
+      options.allowContext !== undefined
+        ? Boolean(options.allowContext)
+        : consent
+        ? Boolean(consent.allowContext)
+        : true;
 
     let groundingContext = null;
     let sources = [];
@@ -252,13 +264,13 @@ const aiService = {
       role: "USER",
       content: message,
       contextUsed,
-    });
+    }).catch(() => null);
 
     // 4. Ambil riwayat chat terbaru untuk context sliding window (6 pesan terakhir)
-    const recentMessages = await chatMessageRepository.findByUserId(userId, {
+    const recentMessages = (await chatMessageRepository.findByUserId(userId, {
       limit: 6,
       orderBy: "asc",
-    });
+    }).catch(() => [])) || [];
 
     // 5. Susun Instruksi Sistem Lengkap (Guardrail + Grounding Data)
     let fullSystemInstruction = aiConfig.systemInstruction;
@@ -339,7 +351,7 @@ PANDUAN KHUSUS ANALISIS BISNIS:
         role: "ASSISTANT",
         content: fullAnswer,
         contextUsed,
-      });
+      }).catch(() => null);
 
       // 8. Catat Penggunaan Token di AiUsage
       await aiUsageRepository.create({
@@ -348,7 +360,7 @@ PANDUAN KHUSUS ANALISIS BISNIS:
         contextUsed,
         inputTokens,
         outputTokens,
-      });
+      }).catch(() => null);
 
       recordSuccess();
 

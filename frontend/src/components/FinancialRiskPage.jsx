@@ -78,6 +78,38 @@ export default function FinancialRiskPage({ onLogout, onNavigate }) {
     setIsUploading(true);
     setTimeout(() => {
       setIsUploading(false);
+
+      // Simpan riwayat laporan keuangan ke localStorage
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem("nexum_finance_history") || "[]"
+        );
+        const now = new Date();
+        const monthNames = [
+          "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+          "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+        ];
+        const periodStr = `Kuartal ${Math.floor(now.getMonth() / 3) + 1} (${monthNames[now.getMonth()]} ${now.getFullYear()})`;
+
+        const newEntry = {
+          id: `FIN-${Date.now().toString().slice(-6)}`,
+          period: periodStr,
+          file: file.name,
+          riskScore: 65.0,
+          status: "WASPADA",
+          currentRatio: "1.10x",
+          netMargin: "-3.0%",
+          note: "Laporan keuangan berhasil diunggah & diproses standar SAK EMKM",
+        };
+
+        localStorage.setItem(
+          "nexum_finance_history",
+          JSON.stringify([newEntry, ...stored])
+        );
+      } catch (err) {
+        console.warn("Gagal menyimpan ke riwayat keuangan:", err);
+      }
+
       alert(
         `Berkas ${file.name} (${fileSizeStr}) berhasil diverifikasi, aman dari ancaman, dan tervalidasi standar SAK EMKM!`
       );

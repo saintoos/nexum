@@ -1,6 +1,5 @@
 import React from "react";
 import { Search } from "lucide-react";
-import NotificationDropdown from "./NotificationDropdown";
 
 export default function TopNavbar({ onNavigate }) {
   return (
@@ -31,15 +30,12 @@ export default function TopNavbar({ onNavigate }) {
         </div>
       </div>
 
-      {/* User & Notifications Navigation */}
+      {/* User Profile Navigation */}
       <div className="flex items-center gap-4">
-        {/* Interactive Notification Dropdown */}
-        <NotificationDropdown onNavigate={onNavigate} />
-
         {/* User Profile Pill */}
         <div
           onClick={() => onNavigate && onNavigate("profile")}
-          className="flex items-center gap-2.5 pl-2 border-l border-white/10 cursor-pointer group"
+          className="flex items-center gap-2.5 cursor-pointer group"
           title="Buka Profil Usaha"
         >
           <div className="text-right hidden sm:block">

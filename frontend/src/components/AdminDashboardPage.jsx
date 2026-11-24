@@ -116,61 +116,17 @@ export default function AdminDashboardPage({
   ]);
   const [financeSaveSuccess, setFinanceSaveSuccess] = useState(false);
 
-  // State Data Pengguna UMKM
+  // State Data Pengguna UMKM (Hanya menyisakan Siti Rahma, profil bisnis dikosongkan)
   const [userList, setUserList] = useState([
     {
       id: "usr-1",
       name: "Siti Rahma",
-      businessName: "Warung Rahma Ritel",
-      sector: "Kuliner & F&B",
+      businessName: "-",
+      sector: "-",
       email: "siti@contoh.com",
-      nib: "9120003482104",
+      nib: "-",
       registeredAt: "12 Okt 2025",
-      locationAnalyses: 4,
-      isActive: true,
-    },
-    {
-      id: "usr-2",
-      name: "Budi Santoso",
-      businessName: "Kopi Nusantara Roastery",
-      sector: "Minuman & Kafe",
-      email: "budi@kopinusantara.id",
-      nib: "9120008821992",
-      registeredAt: "18 Okt 2025",
-      locationAnalyses: 2,
-      isActive: true,
-    },
-    {
-      id: "usr-3",
-      name: "Diana Putri",
-      businessName: "Diana Hijab Official",
-      sector: "Fashion & Tekstil",
-      email: "diana@hijaboutfit.com",
-      nib: "9120004128501",
-      registeredAt: "01 Nov 2025",
-      locationAnalyses: 6,
-      isActive: true,
-    },
-    {
-      id: "usr-4",
-      name: "Ahmad Fauzi",
-      businessName: "Bengkel Sejahtera Motor",
-      sector: "Otomotif & Jasa",
-      email: "ahmad@sejahteramotor.id",
-      nib: "9120007321044",
-      registeredAt: "08 Nov 2025",
-      locationAnalyses: 1,
-      isActive: false,
-    },
-    {
-      id: "usr-5",
-      name: "Lestari Dewi",
-      businessName: "Bakery Aroma Manis",
-      sector: "Pastry & Kue",
-      email: "lestari@aromamanis.co.id",
-      nib: "9120001928374",
-      registeredAt: "14 Nov 2025",
-      locationAnalyses: 3,
+      locationAnalyses: 0,
       isActive: true,
     },
   ]);
@@ -200,27 +156,9 @@ export default function AdminDashboardPage({
       id: "log-3",
       timestamp: "16 Nov 2026, 18:42",
       actor: "siti@contoh.com",
-      action: "RUN_SAW_ANALYSIS",
-      target: "Ruko Gajah Mada Semarang",
+      action: "AUTH_LOGIN",
+      target: "UMKM Portal Session",
       ip: "182.253.12.98",
-      status: "SUCCESS",
-    },
-    {
-      id: "log-4",
-      timestamp: "16 Nov 2026, 15:20",
-      actor: adminEmail || "daffarazan616@students.unnes.ac.id",
-      action: "TOGGLE_USER_STATUS",
-      target: "usr-4 (Ahmad Fauzi) -> SUSPEND",
-      ip: "127.0.0.1",
-      status: "WARNING",
-    },
-    {
-      id: "log-5",
-      timestamp: "15 Nov 2026, 09:10",
-      actor: "budi@kopinusantara.id",
-      action: "FINANCIAL_RISK_CALC",
-      target: "Laporan Keuangan Q3 2025",
-      ip: "114.124.201.5",
       status: "SUCCESS",
     },
   ]);
@@ -566,7 +504,7 @@ export default function AdminDashboardPage({
                         {userList.length} Entitas
                       </div>
                       <span className="text-[11px] text-emerald-600 font-semibold mt-1 inline-block">
-                        4 Akun Aktif (1 Suspend)
+                        {userList.filter((u) => u.isActive).length} Akun Aktif
                       </span>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">

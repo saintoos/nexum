@@ -33,7 +33,7 @@ const updateConsent = async (req, res, next) => {
 
 const sendUserChat = async (req, res, next) => {
   try {
-    const { message } = req.body;
+    const { message, allowContext } = req.body;
     const isStream =
       req.headers.accept?.includes("text/event-stream") ||
       req.query.stream === "true" ||
@@ -49,7 +49,7 @@ const sendUserChat = async (req, res, next) => {
       const result = await aiService.sendChat(
         req.user.id,
         message,
-        {},
+        { allowContext },
         (chunk) => {
           res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
         }
@@ -59,7 +59,9 @@ const sendUserChat = async (req, res, next) => {
       res.end();
     } else {
       // Mode Standar REST JSON (Cocok untuk Postman & Pengujian API)
-      const result = await aiService.sendChat(req.user.id, message);
+      const result = await aiService.sendChat(req.user.id, message, {
+        allowContext,
+      });
       res.status(200).json({
         success: true,
         message: "OK",

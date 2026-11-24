@@ -26,17 +26,17 @@ import {
 } from "lucide-react";
 
 export default function BusinessProfilePage({ onLogout, onNavigate }) {
-  // State form profil
+  // State form profil - Default kosong karena profil bisnis Siti telah dihapus sesuai permintaan
   const [formData, setFormData] = useState({
-    businessName: "Warung Rahma",
-    tradeMark: "Ritel F&B",
-    sector: "Kuliner & Restoran Cepat Saji",
+    businessName: "",
+    tradeMark: "",
+    sector: "",
     customSector: "",
-    scale: "Mikro - < Rp 50 Juta / bulan",
-    nib: "9120003482104",
-    establishedDate: "2021-08-15",
-    address: "Jl. Gajah Mada No. 45, Kota Semarang, Jawa Tengah",
-    coordinates: "-6.9811, 110.4219",
+    scale: "",
+    nib: "",
+    establishedDate: "",
+    address: "",
+    coordinates: "",
   });
 
   // Menghitung estimasi usia operasional usaha secara dinamis
@@ -517,7 +517,7 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                         Bobot Aksesibilitas
                       </div>
                       <div className="text-xl font-extrabold text-slate-900 my-1">
-                        0.35
+                        {formData.businessName ? "0.35" : "-"}
                       </div>
                       <div className="text-[11px] text-slate-400">
                         Kriteria C1 (Lokasi)
@@ -530,7 +530,7 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                         Threshold Kas Minimum
                       </div>
                       <div className="text-xl font-extrabold text-slate-900 my-1">
-                        Rp 12.5 Jt
+                        {formData.businessName ? "Rp 12.5 Jt" : "-"}
                       </div>
                       <div className="text-[11px] text-slate-400">
                         Rasio Likuiditas Mikro
@@ -543,10 +543,10 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                         Zona Kompetisi UMKM
                       </div>
                       <div className="text-xl font-extrabold text-blue-800 my-1">
-                        Sedang-Tinggi
+                        {formData.businessName ? "Sedang-Tinggi" : "-"}
                       </div>
                       <div className="text-[11px] text-blue-600/70">
-                        Radius 1.5 KM Semarang
+                        {formData.businessName ? "Radius 1.5 KM" : "Belum terdata"}
                       </div>
                     </div>
                   </div>
@@ -565,7 +565,9 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                       Siti Rahma
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Owner & Penanggung Jawab Operasional
+                      {formData.businessName
+                        ? `${formData.businessName} • Penanggung Jawab`
+                        : "Pengguna UMKM (Belum Ada Profil Bisnis)"}
                     </p>
 
                     {/* Email Copy Button */}
@@ -601,51 +603,63 @@ export default function BusinessProfilePage({ onLogout, onNavigate }) {
                         RELASI ENTITAS TERKONEKSI
                       </span>
                       <span className="text-[11px] font-semibold text-slate-700">
-                        2 Modul Aktif
+                        {formData.businessName ? "2 Modul Aktif" : "Belum Terhubung"}
                       </span>
                     </div>
 
-                    <div className="space-y-2.5">
-                      {/* Entity 1: Lokasi */}
-                      <div className="p-3 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between transition-colors shadow-none hover:shadow-sm">
-                        <div className="flex items-start gap-2.5 pr-2">
-                          <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md shrink-0 mt-0.5">
-                            <MapPin size={15} />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-slate-900 line-clamp-1">
-                              Jl. Pandanaran No. 12
+                    {formData.businessName ? (
+                      <div className="space-y-2.5">
+                        {/* Entity 1: Lokasi */}
+                        <div className="p-3 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between transition-colors shadow-none hover:shadow-sm">
+                          <div className="flex items-start gap-2.5 pr-2">
+                            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md shrink-0 mt-0.5">
+                              <MapPin size={15} />
                             </div>
-                            <div className="text-[11px] text-slate-500">
-                              Analisis Kelayakan Lokasi
+                            <div>
+                              <div className="text-xs font-bold text-slate-900 line-clamp-1">
+                                Jl. Pandanaran No. 12
+                              </div>
+                              <div className="text-[11px] text-slate-500">
+                                Analisis Kelayakan Lokasi
+                              </div>
                             </div>
                           </div>
+                          <span className="bg-slate-100 text-slate-800 text-[11px] font-bold px-2 py-1 rounded-md shrink-0">
+                            SAW: 70.0
+                          </span>
                         </div>
-                        <span className="bg-slate-100 text-slate-800 text-[11px] font-bold px-2 py-1 rounded-md shrink-0">
-                          SAW: 70.0
-                        </span>
-                      </div>
 
-                      {/* Entity 2: Laporan Keuangan */}
-                      <div className="p-3 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between transition-colors shadow-none hover:shadow-sm">
-                        <div className="flex items-start gap-2.5 pr-2">
-                          <div className="p-1.5 bg-amber-50 text-amber-600 rounded-md shrink-0 mt-0.5">
-                            <FileSpreadsheet size={15} />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-slate-900 line-clamp-1">
-                              Laporan Q3-2024
+                        {/* Entity 2: Laporan Keuangan */}
+                        <div className="p-3 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between transition-colors shadow-none hover:shadow-sm">
+                          <div className="flex items-start gap-2.5 pr-2">
+                            <div className="p-1.5 bg-amber-50 text-amber-600 rounded-md shrink-0 mt-0.5">
+                              <FileSpreadsheet size={15} />
                             </div>
-                            <div className="text-[11px] text-slate-500">
-                              Risiko Keuangan SAK EMKM
+                            <div>
+                              <div className="text-xs font-bold text-slate-900 line-clamp-1">
+                                Laporan Q3-2024
+                              </div>
+                              <div className="text-[11px] text-slate-500">
+                                Risiko Keuangan SAK EMKM
+                              </div>
                             </div>
                           </div>
+                          <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0">
+                            Waspada (65.0)
+                          </span>
                         </div>
-                        <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0">
-                          Waspada (65.0)
-                        </span>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center">
+                        <Store size={22} className="mx-auto text-slate-400 mb-1.5" />
+                        <div className="text-xs font-semibold text-slate-700">
+                          Profil Bisnis Belum Ada
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          Lengkapi formulir di samping untuk mendaftarkan usaha Anda.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

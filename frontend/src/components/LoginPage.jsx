@@ -65,6 +65,10 @@ export default function LoginPage({
       }
 
       // Login Pelaku UMKM biasa
+      try {
+        localStorage.removeItem("nexum_ai_chat_history");
+        sessionStorage.removeItem("nexum_ai_chat_history");
+      } catch (_) {}
       if (onLoginSuccess) {
         onLoginSuccess();
       }

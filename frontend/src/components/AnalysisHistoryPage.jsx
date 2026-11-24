@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopNavbar from "./TopNavbar";
 import {
   LayoutGrid,
@@ -8,27 +8,24 @@ import {
   History,
   Store,
   LogOut,
-  Search,
-  Bell,
   Archive,
   Compass,
   FileSpreadsheet,
   CheckCircle2,
-  ChevronDown,
-  Calendar,
-  ArrowUpDown,
-  X,
   Clock,
   ChevronLeft,
   ChevronRight,
+  Trash2,
+  X,
+  AlertTriangle,
 } from "lucide-react";
 
 export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
   const [activeMenu, setActiveMenu] = useState("riwayat");
   const [activeTab, setActiveTab] = useState("lokasi"); // 'lokasi' | 'keuangan'
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Semua");
   const [currentPageNum, setCurrentPageNum] = useState(1);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const menuItems = [
     { id: "beranda", label: "Beranda", icon: LayoutGrid },
@@ -49,153 +46,141 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
     if (id === "profil" && onNavigate) onNavigate("profile");
   };
 
-  // Data Riwayat Lokasi SAW (28 entries)
-  const locationHistory = [
-    {
-      id: "LOC-2026-0924",
-      date: "24 Sep 2026, 14:32",
-      name: "Ruko Jl. Pandanaran No. 12",
-      category: "Semarang Tengah • Ritel Pakaian Jadi",
-      coordinates: "-6.9932, 110.4203",
-      score: 70.0,
-      status: "LAYAK",
-      factors: "↑ Biaya Sewa (0.80) / ↓ Kompetitor (3 Usaha)",
-    },
-    {
-      id: "LOC-2026-0918",
-      date: "18 Sep 2026, 10:15",
-      name: "Kios Pasar Johar Blok B-4",
-      category: "Semarang Utara • Semi-Permanen Grosir",
-      coordinates: "-6.9734, 110.4289",
-      score: 58.5,
-      status: "TIDAK LAYAK",
-      factors: "↑ Aksesibilitas (0.80) / ↓ Biaya Sewa Tinggi",
-    },
-    {
-      id: "LOC-2026-0902",
-      date: "02 Sep 2026, 16:40",
-      name: "Ruko Ngaliyan Square No. 8",
-      category: "Ngaliyan Barat • Sentra Residensial Baru",
-      coordinates: "-7.0112, 110.3541",
-      score: 74.2,
-      status: "LAYAK",
-      factors: "↑ Potensi Pasar (0.85) / ↓ Akses Parkir Mobil",
-    },
-    {
-      id: "LOC-2026-0828",
-      date: "28 Agu 2026, 11:20",
-      name: "Ruko Banyumanik Jl. Sukun Raya",
-      category: "Banyumanik Selatan • Koridor Komersial",
-      coordinates: "-7.0614, 110.4128",
-      score: 66.8,
-      status: "LAYAK",
-      factors: "↑ Biaya Sewa (0.75) / ↓ Kompetitor (2 Usaha)",
-    },
-    {
-      id: "LOC-2026-0815",
-      date: "15 Agu 2026, 09:05",
-      name: "Stand Simpang Lima Mall Lt. 1",
-      category: "Pusat Kota • Mall Foot Traffic Tinggi",
-      coordinates: "-6.9901, 110.4225",
-      score: 52.0,
-      status: "TIDAK LAYAK",
-      factors: "↑ Potensi Pasar (0.90) / ↓ Sewa Ekstrem (0.20)",
-    },
-    {
-      id: "LOC-2026-0801",
-      date: "01 Agu 2026, 15:55",
-      name: "Ruko Tembalang (Undip Walk)",
-      category: "Tembalang • Kawasan Kampus & Mahasiswa",
-      coordinates: "-7.0543, 110.4371",
-      score: 78.4,
-      status: "LAYAK",
-      factors: "↑ Potensi Pasar (0.95) / ↓ Kompetitor (4 Usaha)",
-    },
-    {
-      id: "LOC-2026-0721",
-      date: "21 Jul 2026, 13:10",
-      name: "Ruko Majapahit Central Kav. 3",
-      category: "Pedurungan • Arteri Primer Semarang-Demak",
-      coordinates: "-6.9882, 110.4589",
-      score: 69.1,
-      status: "LAYAK",
-      factors: "↑ Volume Lalu Lintas / ↓ Kemudahan Putar Balik",
-    },
-    {
-      id: "LOC-2026-0708",
-      date: "08 Jul 2026, 09:45",
-      name: "Ruko Pamularsih Barat Raya",
-      category: "Semarang Barat • Dekat Akses Bandara Lama",
-      coordinates: "-6.9892, 110.3887",
-      score: 61.4,
-      status: "TIDAK LAYAK",
-      factors: "↑ Harga Murah (0.80) / ↓ Kepadatan Warga Rendah",
-    },
-    {
-      id: "LOC-2026-0627",
-      date: "27 Jun 2026, 17:00",
-      name: "Ruko Gajahmada Boulevard No. 4",
-      category: "Semarang Tengah • Golden Triangle Bisnis",
-      coordinates: "-6.9811, 110.4219",
-      score: 72.6,
-      status: "LAYAK",
-      factors: "↑ Daya Beli Konsumen / ↓ Biaya Pemeliharaan Gedung",
-    },
-    {
-      id: "LOC-2026-0612",
-      date: "12 Jun 2026, 11:15",
-      name: "Ruko Kedungmundu Asri No. 19",
-      category: "Tembalang Timur • Kawasan Padat Pemukiman",
-      coordinates: "-7.0189, 110.4632",
-      score: 67.3,
-      status: "LAYAK",
-      factors: "↑ Kepadatan Penduduk (0.84) / ↓ Lebar Jalan Depan",
-    },
-  ];
-
-  // Data Riwayat Analisis Keuangan (13 entries)
-  const financeHistory = [
-    {
-      id: "FIN-2026-Q3",
-      period: "Kuartal 3 (Sep 2026)",
-      file: "Laporan_Keuangan_Sep2026.xlsx",
-      riskScore: 65.0,
-      status: "WASPADA",
-      currentRatio: "1.10x",
-      netMargin: "-3.0%",
-      note: "Defisit kas operasional Rp 1.350.000",
-    },
-    {
-      id: "FIN-2026-Q2",
-      period: "Kuartal 2 (Jun 2026)",
-      file: "Laporan_Keuangan_Jun2026.xlsx",
-      riskScore: 42.0,
-      status: "AMAN",
-      currentRatio: "1.35x",
-      netMargin: "+5.4%",
-      note: "Arus kas stabil, margin optimal",
-    },
-    {
-      id: "FIN-2026-Q1",
-      period: "Kuartal 1 (Mar 2026)",
-      file: "Laporan_Keuangan_Mar2026.xlsx",
-      riskScore: 38.5,
-      status: "AMAN",
-      currentRatio: "1.42x",
-      netMargin: "+6.1%",
-      note: "Pertumbuhan laba awal tahun sehat",
-    },
-  ];
-
-  const filteredLocations = locationHistory.filter((item) => {
-    const matchSearch =
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchStatus =
-      statusFilter === "Semua" || item.status === statusFilter;
-    return matchSearch && matchStatus;
+  // Data Riwayat Lokasi SAW (Dimulai kosong, terisi otomatis saat pengguna menyimpan hasil analisis lokasi)
+  const [locationHistory, setLocationHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("nexum_location_history");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (_) {}
+    return [];
   });
+
+  // Data Riwayat Analisis Keuangan (Dimulai kosong, terisi otomatis saat pengguna mengunggah berkas keuangan)
+  const [financeHistory, setFinanceHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("nexum_finance_history");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (_) {}
+    return [];
+  });
+
+  // Sinkronisasi data jika ada posting baru di tab/jendela lain
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const loc = JSON.parse(localStorage.getItem("nexum_location_history") || "[]");
+        const fin = JSON.parse(localStorage.getItem("nexum_finance_history") || "[]");
+        setLocationHistory(Array.isArray(loc) ? loc : []);
+        setFinanceHistory(Array.isArray(fin) ? fin : []);
+      } catch (_) {}
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSelectedIds([]);
+    setIsDeleteMode(false);
+    setCurrentPageNum(1);
+  };
+
+  const currentList = activeTab === "lokasi" ? locationHistory : financeHistory;
+
+  // Toggle checklist satu item
+  const toggleSelectOne = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  // Toggle checklist semua item pada tab aktif
+  const toggleSelectAll = () => {
+    if (selectedIds.length === currentList.length && currentList.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(currentList.map((item) => item.id));
+    }
+  };
+
+  // Hapus riwayat yang dicentang (select)
+  const handleDeleteSelected = () => {
+    if (selectedIds.length === 0) return;
+    const count = selectedIds.length;
+    if (
+      window.confirm(
+        `Apakah Anda yakin ingin menghapus ${count} riwayat analisis yang dipilih?`
+      )
+    ) {
+      if (activeTab === "lokasi") {
+        const updated = locationHistory.filter(
+          (item) => !selectedIds.includes(item.id)
+        );
+        setLocationHistory(updated);
+        localStorage.setItem("nexum_location_history", JSON.stringify(updated));
+        if (updated.length === 0) setIsDeleteMode(false);
+      } else {
+        const updated = financeHistory.filter(
+          (item) => !selectedIds.includes(item.id)
+        );
+        setFinanceHistory(updated);
+        localStorage.setItem("nexum_finance_history", JSON.stringify(updated));
+        if (updated.length === 0) setIsDeleteMode(false);
+      }
+      setSelectedIds([]);
+    }
+  };
+
+  // Hapus SEMUA riwayat pada tab aktif
+  const handleDeleteAll = () => {
+    if (currentList.length === 0) return;
+    const tabLabel =
+      activeTab === "lokasi" ? "Kelayakan Lokasi (SAW)" : "Analisis Keuangan";
+    if (
+      window.confirm(
+        `PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA (${currentList.length}) riwayat pada ${tabLabel}? Tindakan ini akan mengosongkan seluruh riwayat dan tidak dapat dibatalkan.`
+      )
+    ) {
+      if (activeTab === "lokasi") {
+        setLocationHistory([]);
+        localStorage.setItem("nexum_location_history", JSON.stringify([]));
+      } else {
+        setFinanceHistory([]);
+        localStorage.setItem("nexum_finance_history", JSON.stringify([]));
+      }
+      setSelectedIds([]);
+      setIsDeleteMode(false);
+    }
+  };
+
+  // Batalkan mode hapus
+  const handleCancelDeleteMode = () => {
+    setIsDeleteMode(false);
+    setSelectedIds([]);
+  };
+
+  // Metrik ringkasan dinamis
+  const totalArsip = locationHistory.length + financeHistory.length;
+  const feasibleCount = locationHistory.filter((l) => l.status === "LAYAK").length;
+  const feasibilityRate =
+    locationHistory.length > 0
+      ? `${Math.round((feasibleCount / locationHistory.length) * 100)}%`
+      : "-";
+  const averageSawScore =
+    locationHistory.length > 0
+      ? (
+          locationHistory.reduce((acc, curr) => acc + Number(curr.score || 0), 0) /
+          locationHistory.length
+        ).toFixed(1)
+      : "-";
+  const latestFinance = financeHistory[0] || null;
 
   return (
     <div className="h-screen bg-[#f8fafd] flex flex-col font-sans text-slate-800 overflow-hidden">
@@ -250,9 +235,7 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                 Riwayat Analisis Usaha
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
-                Daftar seluruh riwayat penilaian kelayakan lokasi dan evaluasi
-                risiko keuangan yang pernah tersimpan dalam database analitik
-                NEXUM
+                Daftar riwayat evaluasi kelayakan lokasi dan analisis risiko keuangan yang tersimpan dari aktivitas analisis Anda
               </p>
             </div>
 
@@ -269,15 +252,17 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                   </div>
                   <div className="flex items-baseline gap-2 mt-1">
                     <span className="text-2xl font-extrabold text-slate-900">
-                      41
+                      {totalArsip}
                     </span>
                     <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded">
-                      +8 Bln ini
+                      Tersimpan
                     </span>
                   </div>
                 </div>
                 <div className="mt-3 pt-2 border-t border-slate-50 text-[11px] text-slate-500">
-                  <span>28 Spasial SAW • 13 Rasio Finansial</span>
+                  <span>
+                    {locationHistory.length} Spasial SAW • {financeHistory.length} Rasio Finansial
+                  </span>
                 </div>
               </div>
 
@@ -292,10 +277,10 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                   </div>
                   <div className="flex items-baseline gap-2 mt-1">
                     <span className="text-2xl font-extrabold text-slate-900">
-                      67.8%
+                      {feasibilityRate}
                     </span>
                     <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded">
-                      19 Layak
+                      {feasibleCount} Layak
                     </span>
                   </div>
                 </div>
@@ -315,15 +300,15 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                   </div>
                   <div className="flex items-baseline gap-1 mt-1">
                     <span className="text-2xl font-extrabold text-slate-900">
-                      66.4
+                      {averageSawScore}
                     </span>
                     <span className="text-xs text-slate-400 font-bold">
-                      / 100
+                      {locationHistory.length > 0 ? "/ 100" : ""}
                     </span>
                   </div>
                 </div>
                 <div className="mt-3 pt-2 border-t border-slate-50 text-[11px] text-slate-500">
-                  <span>Tertinggi: 78.4 (Undip Walk)</span>
+                  <span>Dari {locationHistory.length} simulasi tersimpan</span>
                 </div>
               </div>
 
@@ -337,29 +322,33 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                     <CheckCircle2 size={16} className="text-amber-500" />
                   </div>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-2xl font-extrabold text-slate-900">
-                      Q3-2026
+                    <span className="text-lg sm:text-xl font-extrabold text-slate-900">
+                      {latestFinance ? latestFinance.period : "-"}
                     </span>
-                    <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold px-1.5 py-0.5 rounded">
-                      Waspada
-                    </span>
+                    {latestFinance && (
+                      <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                        {latestFinance.status}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="mt-3 pt-2 border-t border-slate-50 text-[11px] text-slate-500">
-                  <span>Tekanan modal likuiditas terdeteksi</span>
+                  <span>
+                    {latestFinance ? latestFinance.note : "Belum ada laporan diunggah"}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* SECTION 2: TABS & FILTER BAR */}
+            {/* SECTION 2: TABS & ACTION BAR */}
             <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
-              {/* Tab Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 px-5 pt-3 gap-2">
+              {/* Tab Header with Hapus Riwayat Actions */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 px-5 pt-3 pb-3 sm:pb-0 gap-3">
                 <div className="flex items-center gap-3">
                   {/* Tab Lokasi */}
                   <button
                     type="button"
-                    onClick={() => setActiveTab("lokasi")}
+                    onClick={() => handleTabChange("lokasi")}
                     className={`flex items-center gap-2 py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all ${
                       activeTab === "lokasi"
                         ? "border-[#0A2540] text-[#0A2540]"
@@ -375,14 +364,14 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      28
+                      {locationHistory.length}
                     </span>
                   </button>
 
                   {/* Tab Keuangan */}
                   <button
                     type="button"
-                    onClick={() => setActiveTab("keuangan")}
+                    onClick={() => handleTabChange("keuangan")}
                     className={`flex items-center gap-2 py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all ${
                       activeTab === "keuangan"
                         ? "border-[#0A2540] text-[#0A2540]"
@@ -398,372 +387,424 @@ export default function AnalysisHistoryPage({ onLogout, onNavigate }) {
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      13
+                      {financeHistory.length}
                     </span>
                   </button>
                 </div>
 
-                <div className="text-[11px] text-slate-400 pb-2 sm:pb-0">
-                  • Total 41 Dokumen Tersimpan • Terakhir Diperbarui: 10 menit
-                  lalu
-                </div>
-              </div>
-
-              {/* Filter Controls Row */}
-              <div className="p-4 sm:p-5 border-b border-slate-100 space-y-3">
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-3">
-                  {/* Search Input */}
-                  <div className="relative w-full lg:max-w-md">
-                    <Search
-                      size={14}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Cari nama lokasi, jalan, koordinat, atau periode..."
-                      className="w-full bg-[#F1F4F9] text-xs text-slate-800 placeholder-slate-400 rounded-lg pl-9 pr-3 py-2 outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* Filter Dropdowns */}
-                  <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    {/* Status Dropdown */}
-                    <div className="relative">
-                      <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-[#F1F4F9] text-xs text-slate-700 font-medium py-2 pl-3 pr-7 rounded-lg outline-none appearance-none cursor-pointer"
+                {/* Tombol Aksi Hapus */}
+                <div className="flex items-center gap-2.5 pb-2 sm:pb-0">
+                  {!isDeleteMode ? (
+                    currentList.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleteMode(true)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 border border-red-200/80 rounded-lg transition-all shadow-xs"
+                        title="Klik untuk memilih dan menghapus riwayat"
                       >
-                        <option value="Semua">
-                          Status Kelayakan: Semua Status
-                        </option>
-                        <option value="LAYAK">Hanya LAYAK</option>
-                        <option value="TIDAK LAYAK">Hanya TIDAK LAYAK</option>
-                      </select>
-                      <ChevronDown
-                        size={14}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                      />
+                        <Trash2 size={13} />
+                        <span>Hapus Riwayat</span>
+                      </button>
+                    )
+                  ) : (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Tombol Hapus Terpilih */}
+                      <button
+                        type="button"
+                        onClick={handleDeleteSelected}
+                        disabled={selectedIds.length === 0}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-xs ${
+                          selectedIds.length > 0
+                            ? "text-white bg-red-600 hover:bg-red-700 active:scale-[0.99] cursor-pointer"
+                            : "text-slate-400 bg-slate-100 cursor-not-allowed border border-slate-200"
+                        }`}
+                        title="Hapus hanya riwayat yang dicentang"
+                      >
+                        <Trash2 size={13} />
+                        <span>Hapus Terpilih ({selectedIds.length})</span>
+                      </button>
+
+                      {/* Tombol Hapus Semua */}
+                      <button
+                        type="button"
+                        onClick={handleDeleteAll}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-700 bg-red-100 hover:bg-red-200 active:scale-[0.99] border border-red-300 rounded-lg transition-all"
+                        title="Hapus seluruh riwayat pada kategori ini"
+                      >
+                        <Trash2 size={13} />
+                        <span>Hapus Semua</span>
+                      </button>
+
+                      {/* Tombol Batal */}
+                      <button
+                        type="button"
+                        onClick={handleCancelDeleteMode}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                      >
+                        <X size={13} />
+                        <span>Batal</span>
+                      </button>
                     </div>
-
-                    {/* Date Filter */}
-                    <button
-                      type="button"
-                      className="flex items-center gap-1.5 bg-[#F1F4F9] text-xs text-slate-700 font-medium py-2 px-3 rounded-lg hover:bg-slate-200/80 transition-colors"
-                    >
-                      <Calendar size={13} className="text-slate-500" />
-                      <span>1 - 30 Sep 2026</span>
-                      <ChevronDown size={13} className="text-slate-400" />
-                    </button>
-
-                    {/* Sort Filter */}
-                    <button
-                      type="button"
-                      className="flex items-center gap-1.5 bg-[#F1F4F9] text-xs text-slate-700 font-medium py-2 px-3 rounded-lg hover:bg-slate-200/80 transition-colors"
-                    >
-                      <ArrowUpDown size={13} className="text-slate-500" />
-                      <span>Urutkan: Terbaru</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Active Filter Chips */}
-                <div className="flex flex-wrap items-center justify-between text-xs pt-1 gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-[11px] font-semibold">
-                      Filter Aktif:
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-[#EEF4FF] text-blue-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                      Tahun 2026 <X size={11} className="cursor-pointer" />
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-[#EEF4FF] text-blue-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                      Semua Wilayah Semarang{" "}
-                      <X size={11} className="cursor-pointer" />
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setStatusFilter("Semua");
-                      }}
-                      className="text-[11px] text-blue-700 hover:underline font-semibold ml-1"
-                    >
-                      Reset Filter
-                    </button>
-                  </div>
-
-                  <span className="text-[11px] text-slate-400">
-                    Menampilkan data terindeks Algoritma SAW V2
-                  </span>
+                  )}
                 </div>
               </div>
 
-              {/* SECTION 3: TABLE DATA */}
-              {activeTab === "lokasi" ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                        <th className="py-3 px-4">TANGGAL & JAM</th>
-                        <th className="py-3 px-4">NAMA KANDIDAT LOKASI</th>
-                        <th className="py-3 px-4 text-center">
-                          KOORDINAT GEOGRAFIS
-                        </th>
-                        <th className="py-3 px-4 text-center">SKOR SAW</th>
-                        <th className="py-3 px-4 text-center">
-                          STATUS KELAYAKAN
-                        </th>
-                        <th className="py-3 px-4">
-                          FAKTOR KUNCI (KUAT / LEMAH)
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredLocations.map((row) => {
-                        const isFeasible = row.status === "LAYAK";
-                        return (
-                          <tr
-                            key={row.id}
-                            className="hover:bg-slate-50/80 transition-colors"
-                          >
-                            {/* Tanggal & ID */}
-                            <td className="py-3.5 px-4 whitespace-nowrap">
-                              <div className="flex items-center gap-1.5 text-slate-700 font-medium">
-                                <Clock size={12} className="text-slate-400" />
-                                <span>{row.date}</span>
-                              </div>
-                              <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                                ID: {row.id}
-                              </div>
-                            </td>
-
-                            {/* Nama Kandidat & Kategori */}
-                            <td className="py-3.5 px-4">
-                              <div className="font-bold text-slate-900 leading-snug">
-                                {row.name}
-                              </div>
-                              <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
-                                <MapPin
-                                  size={11}
-                                  className="text-slate-400 shrink-0"
-                                />
-                                <span>{row.category}</span>
-                              </div>
-                            </td>
-
-                            {/* Koordinat */}
-                            <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                              <span className="font-mono text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-                                {row.coordinates}
-                              </span>
-                            </td>
-
-                            {/* Skor SAW */}
-                            <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                              <div className="flex flex-col items-center">
-                                <div className="flex items-baseline gap-0.5">
-                                  <span
-                                    className={`text-sm font-extrabold ${
-                                      isFeasible
-                                        ? "text-blue-700"
-                                        : "text-red-600"
-                                    }`}
-                                  >
-                                    {row.score.toFixed(1)}
-                                  </span>
-                                  <span className="text-[10px] text-slate-400">
-                                    / 100
-                                  </span>
-                                </div>
-                                <div className="w-14 bg-slate-100 h-1 rounded-full overflow-hidden mt-1">
-                                  <div
-                                    className={`h-full rounded-full ${
-                                      isFeasible ? "bg-blue-600" : "bg-red-500"
-                                    }`}
-                                    style={{ width: `${row.score}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Status */}
-                            <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                              <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-extrabold tracking-wider uppercase ${
-                                  isFeasible
-                                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                    : "bg-red-50 text-red-700 border border-red-200"
-                                }`}
-                              >
-                                <span
-                                  className={`w-1.5 h-1.5 rounded-full ${
-                                    isFeasible ? "bg-blue-600" : "bg-red-600"
-                                  }`}
-                                ></span>
-                                {row.status}
-                              </span>
-                            </td>
-
-                            {/* Faktor Kunci */}
-                            <td className="py-3.5 px-4 text-[11px] text-slate-600 leading-snug">
-                              {row.factors}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                /* TAB 2: DATA RIWAYAT KEUANGAN */
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                        <th className="py-3 px-4">PERIODE LAPORAN</th>
-                        <th className="py-3 px-4">BERKAS EXCEL</th>
-                        <th className="py-3 px-4 text-center">INDEKS RISIKO</th>
-                        <th className="py-3 px-4 text-center">CURRENT RATIO</th>
-                        <th className="py-3 px-4 text-center">NET MARGIN</th>
-                        <th className="py-3 px-4 text-center">
-                          STATUS SAK EMKM
-                        </th>
-                        <th className="py-3 px-4">CATATAN EVALUASI</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {financeHistory.map((item) => (
-                        <tr
-                          key={item.id}
-                          className="hover:bg-slate-50/80 transition-colors"
-                        >
-                          <td className="py-3.5 px-4 font-bold text-slate-900">
-                            {item.period}
-                            <div className="text-[10px] text-slate-400 font-mono font-normal">
-                              ID: {item.id}
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <div className="flex items-center gap-1.5 text-blue-700 font-semibold cursor-pointer hover:underline">
-                              <FileSpreadsheet
-                                size={14}
-                                className="text-emerald-600"
-                              />
-                              <span>{item.file}</span>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-4 text-center font-extrabold text-slate-800">
-                            {item.riskScore} / 100
-                          </td>
-                          <td className="py-3.5 px-4 text-center font-bold text-slate-700 font-mono">
-                            {item.currentRatio}
-                          </td>
-                          <td
-                            className={`py-3.5 px-4 text-center font-bold font-mono ${
-                              item.netMargin.startsWith("-")
-                                ? "text-red-600"
-                                : "text-emerald-600"
-                            }`}
-                          >
-                            {item.netMargin}
-                          </td>
-                          <td className="py-3.5 px-4 text-center">
-                            <span
-                              className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
-                                item.status === "AMAN"
-                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                  : "bg-amber-50 text-amber-700 border border-amber-200"
-                              }`}
-                            >
-                              {item.status}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-[11px] text-slate-500">
-                            {item.note}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              {/* Mode Hapus Banner Informasi */}
+              {isDeleteMode && (
+                <div className="bg-red-50/70 border-b border-red-100 px-5 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2 text-red-900 font-medium">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0"></span>
+                    <span>
+                      Silakan centang riwayat yang ingin dihapus, lalu klik <strong>"Hapus Terpilih"</strong>, atau klik <strong>"Hapus Semua"</strong> untuk membersihkan seluruh riwayat.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-[11px] font-bold text-slate-500">
+                      {selectedIds.length} dari {currentList.length} dipilih
+                    </span>
+                    <button
+                      type="button"
+                      onClick={toggleSelectAll}
+                      className="text-xs font-bold text-blue-700 hover:text-blue-900 hover:underline"
+                    >
+                      {selectedIds.length === currentList.length && currentList.length > 0
+                        ? "Batalkan Semua"
+                        : "Pilih Semua"}
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {/* SECTION 4: PAGINATION FOOTER */}
+              {/* SECTION 3: TABLE DATA */}
+              {activeTab === "lokasi" ? (
+                locationHistory.length === 0 ? (
+                  <div className="p-12 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                      <MapPin size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-800">
+                        Belum Ada Riwayat Kelayakan Lokasi
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                        Lakukan simulasi kelayakan pada menu <strong>Kelayakan Lokasi</strong> lalu klik "Simpan ke Riwayat Analisis" agar laporan masuk dan tampil di sini.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-slate-50/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                          {isDeleteMode && (
+                            <th className="py-3 px-3 w-10 text-center">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  locationHistory.length > 0 &&
+                                  selectedIds.length === locationHistory.length
+                                }
+                                onChange={toggleSelectAll}
+                                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                title="Pilih semua baris lokasi"
+                              />
+                            </th>
+                          )}
+                          <th className="py-3 px-4">TANGGAL & JAM</th>
+                          <th className="py-3 px-4">NAMA KANDIDAT LOKASI</th>
+                          <th className="py-3 px-4 text-center">
+                            WILAYAH / PROVINSI
+                          </th>
+                          <th className="py-3 px-4 text-center">SKOR SAW</th>
+                          <th className="py-3 px-4 text-center">
+                            STATUS KELAYAKAN
+                          </th>
+                          <th className="py-3 px-4">
+                            FAKTOR KUNCI
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {locationHistory.map((row) => {
+                          const isFeasible = row.status === "LAYAK";
+                          const isChecked = selectedIds.includes(row.id);
+                          return (
+                            <tr
+                              key={row.id}
+                              onClick={() => {
+                                if (isDeleteMode) toggleSelectOne(row.id);
+                              }}
+                              className={`transition-colors ${
+                                isDeleteMode ? "cursor-pointer" : ""
+                              } ${
+                                isChecked
+                                  ? "bg-red-50/40"
+                                  : "hover:bg-slate-50/80"
+                              }`}
+                            >
+                              {/* Checkbox Seleksi jika Mode Hapus Aktif */}
+                              {isDeleteMode && (
+                                <td
+                                  className="py-3.5 px-3 text-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => toggleSelectOne(row.id)}
+                                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                    title="Pilih baris ini"
+                                  />
+                                </td>
+                              )}
+
+                              {/* Tanggal & ID */}
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <div className="flex items-center gap-1.5 text-slate-700 font-medium">
+                                  <Clock size={12} className="text-slate-400" />
+                                  <span>{row.date}</span>
+                                </div>
+                                <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                  ID: {row.id}
+                                </div>
+                              </td>
+
+                              {/* Nama Kandidat & Kategori */}
+                              <td className="py-3.5 px-4">
+                                <div className="font-bold text-slate-900 leading-snug">
+                                  {row.name}
+                                </div>
+                                <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
+                                  <MapPin
+                                    size={11}
+                                    className="text-slate-400 shrink-0"
+                                  />
+                                  <span>{row.category}</span>
+                                </div>
+                              </td>
+
+                              {/* Wilayah */}
+                              <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                <span className="text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                                  {row.category}
+                                </span>
+                              </td>
+
+                              {/* Skor SAW */}
+                              <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                <div className="flex flex-col items-center">
+                                  <div className="flex items-baseline gap-0.5">
+                                    <span
+                                      className={`text-sm font-extrabold ${
+                                        isFeasible
+                                          ? "text-blue-700"
+                                          : "text-red-600"
+                                      }`}
+                                    >
+                                      {Number(row.score).toFixed(1)}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400">
+                                      / 100
+                                    </span>
+                                  </div>
+                                  <div className="w-14 bg-slate-100 h-1 rounded-full overflow-hidden mt-1">
+                                    <div
+                                      className={`h-full rounded-full ${
+                                        isFeasible ? "bg-blue-600" : "bg-red-500"
+                                      }`}
+                                      style={{ width: `${Math.min(100, row.score)}%` }}
+                                    ></div>
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Status */}
+                              <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-extrabold tracking-wider uppercase ${
+                                    isFeasible
+                                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                      : "bg-red-50 text-red-700 border border-red-200"
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      isFeasible ? "bg-blue-600" : "bg-red-600"
+                                    }`}
+                                  ></span>
+                                  {row.status}
+                                </span>
+                              </td>
+
+                              {/* Faktor Kunci */}
+                              <td className="py-3.5 px-4 text-[11px] text-slate-600 leading-snug">
+                                {row.factors}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              ) : (
+                /* TAB 2: DATA RIWAYAT KEUANGAN */
+                financeHistory.length === 0 ? (
+                  <div className="p-12 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                      <FileSpreadsheet size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-800">
+                        Belum Ada Riwayat Analisis Keuangan
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                        Unggah berkas excel pada menu <strong>Risiko Keuangan</strong> agar hasil audit SAK EMKM tersimpan dan tampil di sini.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-slate-50/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                          {isDeleteMode && (
+                            <th className="py-3 px-3 w-10 text-center">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  financeHistory.length > 0 &&
+                                  selectedIds.length === financeHistory.length
+                                }
+                                onChange={toggleSelectAll}
+                                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                title="Pilih semua baris keuangan"
+                              />
+                            </th>
+                          )}
+                          <th className="py-3 px-4">PERIODE LAPORAN</th>
+                          <th className="py-3 px-4">BERKAS EXCEL</th>
+                          <th className="py-3 px-4 text-center">INDEKS RISIKO</th>
+                          <th className="py-3 px-4 text-center">CURRENT RATIO</th>
+                          <th className="py-3 px-4 text-center">NET MARGIN</th>
+                          <th className="py-3 px-4 text-center">
+                            STATUS SAK EMKM
+                          </th>
+                          <th className="py-3 px-4">CATATAN EVALUASI</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {financeHistory.map((item) => {
+                          const isChecked = selectedIds.includes(item.id);
+                          return (
+                            <tr
+                              key={item.id}
+                              onClick={() => {
+                                if (isDeleteMode) toggleSelectOne(item.id);
+                              }}
+                              className={`transition-colors ${
+                                isDeleteMode ? "cursor-pointer" : ""
+                              } ${
+                                isChecked
+                                  ? "bg-red-50/40"
+                                  : "hover:bg-slate-50/80"
+                              }`}
+                            >
+                              {/* Checkbox Seleksi jika Mode Hapus Aktif */}
+                              {isDeleteMode && (
+                                <td
+                                  className="py-3.5 px-3 text-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => toggleSelectOne(item.id)}
+                                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                    title="Pilih baris ini"
+                                  />
+                                </td>
+                              )}
+
+                              <td className="py-3.5 px-4 font-bold text-slate-900">
+                                {item.period}
+                                <div className="text-[10px] text-slate-400 font-mono font-normal">
+                                  ID: {item.id}
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center gap-1.5 text-blue-700 font-semibold cursor-pointer hover:underline">
+                                  <FileSpreadsheet
+                                    size={14}
+                                    className="text-emerald-600"
+                                  />
+                                  <span>{item.file}</span>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-extrabold text-slate-800">
+                                {item.riskScore} / 100
+                              </td>
+                              <td className="py-3.5 px-4 text-center font-bold text-slate-700 font-mono">
+                                {item.currentRatio}
+                              </td>
+                              <td
+                                className={`py-3.5 px-4 text-center font-bold font-mono ${
+                                  item.netMargin.startsWith("-")
+                                    ? "text-red-600"
+                                    : "text-emerald-600"
+                                }`}
+                              >
+                                {item.netMargin}
+                              </td>
+                              <td className="py-3.5 px-4 text-center">
+                                <span
+                                  className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
+                                    item.status === "AMAN"
+                                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                                  }`}
+                                >
+                                  {item.status}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 text-[11px] text-slate-500">
+                                {item.note}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              )}
+
+              {/* SECTION 4: FOOTER INFORMASI TOTAL */}
               <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
                 <div>
-                  Menampilkan <strong className="text-slate-800">1 - 10</strong>{" "}
-                  dari <strong className="text-slate-800">28</strong> riwayat
-                  kelayakan lokasi (Total 41 entri terdaftar)
+                  Menampilkan <strong className="text-slate-800">{currentList.length}</strong> entri riwayat pada tab {activeTab === "lokasi" ? "Kelayakan Lokasi" : "Risiko Keuangan"} (Total <strong className="text-slate-800">{totalArsip}</strong> laporan tersimpan)
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <span>Baris per halaman:</span>
-                    <select className="bg-[#F1F4F9] text-xs font-semibold py-1 px-2 rounded outline-none border border-slate-200">
-                      <option>10</option>
-                      <option>25</option>
-                      <option>50</option>
-                    </select>
-                  </div>
-
-                  {/* Page Buttons */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      disabled={currentPageNum === 1}
-                      onClick={() =>
-                        setCurrentPageNum((p) => Math.max(1, p - 1))
-                      }
-                      className="w-7 h-7 rounded border border-slate-200 flex items-center justify-center hover:bg-slate-100 disabled:opacity-40"
-                    >
-                      <ChevronLeft size={13} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentPageNum(1)}
-                      className={`w-7 h-7 rounded font-bold text-xs ${
-                        currentPageNum === 1
-                          ? "bg-[#0A2540] text-white"
-                          : "border border-slate-200 hover:bg-slate-100"
-                      }`}
-                    >
-                      1
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentPageNum(2)}
-                      className={`w-7 h-7 rounded font-bold text-xs ${
-                        currentPageNum === 2
-                          ? "bg-[#0A2540] text-white"
-                          : "border border-slate-200 hover:bg-slate-100"
-                      }`}
-                    >
-                      2
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentPageNum(3)}
-                      className={`w-7 h-7 rounded font-bold text-xs ${
-                        currentPageNum === 3
-                          ? "bg-[#0A2540] text-white"
-                          : "border border-slate-200 hover:bg-slate-100"
-                      }`}
-                    >
-                      3
-                    </button>
-                    <button
-                      type="button"
-                      disabled={currentPageNum === 3}
-                      onClick={() =>
-                        setCurrentPageNum((p) => Math.min(3, p + 1))
-                      }
-                      className="w-7 h-7 rounded border border-slate-200 flex items-center justify-center hover:bg-slate-100 disabled:opacity-40"
-                    >
-                      <ChevronRight size={13} />
-                    </button>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={currentPageNum === 1 || currentList.length === 0}
+                    onClick={() => setCurrentPageNum((p) => Math.max(1, p - 1))}
+                    className="w-7 h-7 rounded border border-slate-200 flex items-center justify-center hover:bg-slate-100 disabled:opacity-40"
+                  >
+                    <ChevronLeft size={13} />
+                  </button>
+                  <span className="px-2.5 text-xs font-semibold text-slate-700">
+                    Halaman {currentList.length > 0 ? currentPageNum : 0}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={currentList.length === 0}
+                    onClick={() => setCurrentPageNum((p) => p + 1)}
+                    className="w-7 h-7 rounded border border-slate-200 flex items-center justify-center hover:bg-slate-100 disabled:opacity-40"
+                  >
+                    <ChevronRight size={13} />
+                  </button>
                 </div>
               </div>
             </div>

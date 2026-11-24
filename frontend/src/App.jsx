@@ -20,6 +20,25 @@ function AppContent() {
   const [adminEmail, setAdminEmail] = useState("daffarazan616@students.unnes.ac.id");
   const [adminPassword, setAdminPassword] = useState("Orbit!Kopi72#Langit9Biru");
 
+  // Bersihkan riwayat chat AI saat logout atau login ulang sesuai permintaan
+  const handleClearChatSession = () => {
+    try {
+      localStorage.removeItem("nexum_ai_chat_history");
+      sessionStorage.removeItem("nexum_ai_chat_history");
+      fetch("/api/ai/history", { method: "DELETE" }).catch(() => {});
+    } catch (_) {}
+  };
+
+  const handleLogout = () => {
+    handleClearChatSession();
+    navigate("/login");
+  };
+
+  const handleLoginSuccess = () => {
+    handleClearChatSession();
+    navigate("/dashboard");
+  };
+
   // Helper agar navigasi internal komponen (onNavigate("location") atau onNavigate("/location")) bekerja seragam
   const handleNavigate = (path) => {
     if (!path) return;
@@ -48,9 +67,12 @@ function AppContent() {
           element={
             <LoginPage
               onNavigateToRegister={() => navigate("/register")}
-              onLoginSuccess={() => navigate("/dashboard")}
+              onLoginSuccess={handleLoginSuccess}
               onNavigateToLanding={() => navigate("/")}
-              onAdminLogin={() => navigate("/admin")}
+              onAdminLogin={() => {
+                handleClearChatSession();
+                navigate("/admin");
+              }}
               adminEmail={adminEmail}
               adminPassword={adminPassword}
             />
@@ -73,7 +95,7 @@ function AppContent() {
           path="/dashboard"
           element={
             <DashboardPage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onNavigate={handleNavigate}
             />
           }
@@ -82,7 +104,7 @@ function AppContent() {
           path="/location"
           element={
             <LocationPredictionPage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onNavigate={handleNavigate}
             />
           }
@@ -91,7 +113,7 @@ function AppContent() {
           path="/finance"
           element={
             <FinancialRiskPage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onNavigate={handleNavigate}
             />
           }
@@ -100,7 +122,7 @@ function AppContent() {
           path="/ai"
           element={
             <AiConsultingPage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onNavigate={handleNavigate}
             />
           }
@@ -109,7 +131,7 @@ function AppContent() {
           path="/history"
           element={
             <AnalysisHistoryPage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onNavigate={handleNavigate}
             />
           }
@@ -118,7 +140,7 @@ function AppContent() {
           path="/profile"
           element={
             <BusinessProfilePage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onNavigate={handleNavigate}
             />
           }
@@ -131,7 +153,7 @@ function AppContent() {
           path="/admin"
           element={
             <AdminDashboardPage
-              onLogout={() => navigate("/login")}
+              onLogout={handleLogout}
               onSwitchToUser={() => navigate("/dashboard")}
               adminEmail={adminEmail}
               adminPassword={adminPassword}

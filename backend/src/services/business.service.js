@@ -33,7 +33,7 @@ const businessService = {
       throw error;
     }
 
-    const { name, sector, sectorOther, address, quarterlyRevenueTarget } = data;
+    const { name, sector, sectorOther, address, quarterlyRevenueTarget, latitude, longitude } = data;
 
     if (!name || !name.trim()) {
       const error = new Error("Nama usaha wajib diisi.");
@@ -62,6 +62,14 @@ const businessService = {
       sector: sector.trim(),
       sectorOther: sectorOther ? sectorOther.trim() : null,
       address: address.trim(),
+      latitude:
+        latitude !== undefined && latitude !== null && latitude !== ""
+          ? Number(latitude)
+          : null,
+      longitude:
+        longitude !== undefined && longitude !== null && longitude !== ""
+          ? Number(longitude)
+          : null,
       quarterlyRevenueTarget: quarterlyRevenueTarget ? Number(quarterlyRevenueTarget) : null,
     };
 
@@ -82,13 +90,21 @@ const businessService = {
       throw error;
     }
 
-    const { name, sector, sectorOther, address, quarterlyRevenueTarget } = data;
+    const { name, sector, sectorOther, address, quarterlyRevenueTarget, latitude, longitude } = data;
     const updateData = {};
 
     if (name !== undefined) updateData.name = name.trim();
     if (sector !== undefined) updateData.sector = sector.trim();
     if (sectorOther !== undefined) updateData.sectorOther = sectorOther ? sectorOther.trim() : null;
     if (address !== undefined) updateData.address = address.trim();
+    if (latitude !== undefined) {
+      updateData.latitude =
+        latitude !== null && latitude !== "" ? Number(latitude) : null;
+    }
+    if (longitude !== undefined) {
+      updateData.longitude =
+        longitude !== null && longitude !== "" ? Number(longitude) : null;
+    }
     if (quarterlyRevenueTarget !== undefined) {
       updateData.quarterlyRevenueTarget = quarterlyRevenueTarget ? Number(quarterlyRevenueTarget) : null;
     }

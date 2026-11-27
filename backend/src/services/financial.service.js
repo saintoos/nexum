@@ -443,6 +443,26 @@ const financialService = {
       orderBy: "desc",
     });
   },
+
+  /**
+   * Menghapus catatan analisis keuangan dan periode terkait
+   * @param {string} userId
+   * @param {string} analysisId
+   */
+  async deleteAnalysis(userId, analysisId) {
+    const analysis = await financialAnalysisRepository.findById(analysisId);
+    if (!analysis || analysis.userId !== userId) {
+      const error = new Error("Data analisis keuangan tidak ditemukan.");
+      error.status = 404;
+      error.code = "ANALYSIS_NOT_FOUND";
+      throw error;
+    }
+
+    await financialPeriodRepository.deleteBySourceAnalysisId(analysisId);
+    await financialAnalysisRepository.deleteById(analysisId);
+
+    return { id: analysisId, code: analysis.code };
+  },
 };
 
 module.exports = financialService;

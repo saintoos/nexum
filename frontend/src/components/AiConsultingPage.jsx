@@ -123,6 +123,87 @@ export default function AiConsultingPage({ onLogout, onNavigate }) {
     return DEFAULT_AI_MESSAGES;
   });
 
+  // Ambil riwayat chat nyata dari backend saat pertama kali halaman dimuat
+  useEffect(() => {
+    const fetchHistoryFromBackend = async () => {
+      const token =
+        localStorage.getItem("token") ||
+        sessionStorage.getItem("token") ||
+        localStorage.getItem("nexum_token") ||
+        "";
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      try {
+        let response;
+        try {
+          response = await fetch("/api/ai/history?limit=30", { headers });
+        } catch (_) {
+          response = await fetch("http://localhost:5000/api/ai/history?limit=30", { headers });
+        }
+
+        if (response.ok) {
+          const resJson = await response.json();
+          const dbMessages = resJson.data?.messages || [];
+          if (dbMessages.length > 0) {
+            const mapped = dbMessages.map((msg) => {
+              if (msg.role === "USER") {
+                return {
+                  id: msg.id,
+                  sender: "user",
+                  name: "Anda",
+                  time: new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                  text: msg.content,
+                };
+              }
+              // Assistant
+              let structured = msg.structured;
+              if (!structured && msg.content) {
+                try {
+                  const cleaned = msg.content
+                    .replace(/^```json\s*/i, "")
+                    .replace(/```\s*$/i, "")
+                    .trim();
+                  const parsed = JSON.parse(cleaned);
+                  if (parsed.intro || parsed.priorities || parsed.actionPlan) {
+                    structured = parsed;
+                  }
+                } catch (_) {}
+              }
+
+              const hasStructured = Boolean(
+                structured &&
+                  (structured.intro || structured.priorities || structured.actionPlan)
+              );
+
+              return {
+                id: msg.id,
+                sender: "ai",
+                name: "Asisten Konsultasi Bisnis NEXUM",
+                version: "RAG-V2.4",
+                time:
+                  new Date(msg.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }) + " WIB",
+                intro: structured?.intro || (!hasStructured ? msg.content : ""),
+                priorities: structured?.priorities || null,
+                actionPlan: structured?.actionPlan || null,
+                rawText: !hasStructured ? msg.content : "",
+                sources: msg.sources || [],
+              };
+            });
+            setMessages(mapped);
+          }
+        }
+      } catch (err) {
+        console.warn("Gagal memuat history chat dari backend:", err);
+      }
+    };
+
+    fetchHistoryFromBackend();
+  }, []);
+
   // Simpan riwayat chat ke localStorage setiap kali ada pesan baru
   useEffect(() => {
     try {
@@ -647,8 +728,8 @@ export default function AiConsultingPage({ onLogout, onNavigate }) {
                         </p>
                       )}
 
-                      {/* Raw Text or Markdown paragraphs */}
-                      {msg.rawText && (
+                      {/* Raw Text or Markdown paragraphs (hanya jika respons belum/bukan berbentuk kartu struktur) */}
+                      {msg.rawText && !msg.priorities && !msg.actionPlan && (
                         <div className="pt-1">
                           <FormattedText text={msg.rawText} />
                         </div>
@@ -657,60 +738,73 @@ export default function AiConsultingPage({ onLogout, onNavigate }) {
                       {/* Priorities Cards (Grid 2 cols) */}
                       {msg.priorities && msg.priorities.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
-                          {msg.priorities.map((item, pIdx) => (
-                            <div
-                              key={item.id || pIdx}
-                              className={`rounded-xl p-4 border ${
-                                item.type === "danger"
-                                  ? "bg-red-50/50 border-red-200/80"
-                                  : "bg-blue-50/50 border-blue-200/80"
-                              }`}
-                            >
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span
-                                  className={`text-[11px] font-bold ${
-                                    item.type === "danger"
-                                      ? "text-red-700"
-                                      : "text-blue-700"
-                                  }`}
-                                >
-                                  {item.tag || `Prioritas #${pIdx + 1}`}
-                                </span>
-                                {item.type === "danger" ? (
-                                  <AlertTriangle
-                                    size={14}
-                                    className="text-red-600"
-                                  />
-                                ) : (
-                                  <TrendingUp
-                                    size={14}
-                                    className="text-blue-600"
-                                  />
-                                )}
+                          {msg.priorities.map((item, pIdx) => {
+                            const isDanger = item.type === "danger";
+                            const isWarning = item.type === "warning";
+                            return (
+                              <div
+                                key={item.id || pIdx}
+                                className={`rounded-xl p-4 border transition-all ${
+                                  isDanger
+                                    ? "bg-red-50/20 border-red-200/90"
+                                    : isWarning
+                                    ? "bg-amber-50/20 border-amber-200/90"
+                                    : "bg-blue-50/20 border-blue-200/90"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <span
+                                    className={`text-[11px] font-bold ${
+                                      isDanger
+                                        ? "text-red-700"
+                                        : isWarning
+                                        ? "text-amber-800"
+                                        : "text-blue-700"
+                                    }`}
+                                  >
+                                    {item.tag || `Prioritas #${pIdx + 1}`}
+                                  </span>
+                                  {isDanger ? (
+                                    <AlertTriangle
+                                      size={14}
+                                      className="text-red-600"
+                                    />
+                                  ) : isWarning ? (
+                                    <AlertTriangle
+                                      size={14}
+                                      className="text-amber-600"
+                                    />
+                                  ) : (
+                                    <TrendingUp
+                                      size={14}
+                                      className="text-blue-600"
+                                    />
+                                  )}
+                                </div>
+                                <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+                                  {item.title}
+                                </h4>
+                                <p className="text-[11px] sm:text-xs text-slate-600 mt-1.5 leading-relaxed">
+                                  {item.desc}
+                                </p>
                               </div>
-                              <h4 className="text-xs sm:text-sm font-bold text-slate-900">
-                                {item.title}
-                              </h4>
-                              <p className="text-[11px] sm:text-xs text-slate-600 mt-1 leading-relaxed">
-                                {item.desc}
-                              </p>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 
                       {/* Target Aksi Cepat 60 Hari */}
                       {msg.actionPlan && (
-                        <div className="bg-sky-50/80 border border-sky-200/70 rounded-xl p-3.5 flex items-start gap-3">
+                        <div className="bg-[#F0F7FF] border border-[#D0E2FF] rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
                           <Target
-                            size={18}
-                            className="text-blue-700 shrink-0 mt-0.5"
+                            size={20}
+                            className="text-blue-600 shrink-0 mt-0.5"
                           />
                           <div>
-                            <h4 className="text-xs font-bold text-blue-950">
-                              {msg.actionPlan.title || "Target Aksi Cepat"}
+                            <h4 className="text-xs sm:text-sm font-bold text-[#0A2540]">
+                              {msg.actionPlan.title || "Target Aksi Cepat 60 Hari"}
                             </h4>
-                            <p className="text-[11px] sm:text-xs text-blue-900/90 mt-0.5 leading-relaxed">
+                            <p className="text-xs sm:text-sm text-[#1E3A8A] font-medium mt-1 leading-relaxed">
                               {msg.actionPlan.desc}
                             </p>
                           </div>
@@ -727,10 +821,10 @@ export default function AiConsultingPage({ onLogout, onNavigate }) {
                             {msg.sources.map((src, idx) => (
                               <div
                                 key={idx}
-                                className="inline-flex items-center gap-1.5 bg-[#F1F4F9] border border-slate-200/80 rounded-md py-1 px-2.5 text-[11px] text-slate-700"
+                                className="inline-flex items-center gap-1.5 bg-[#F4F7FB] border border-slate-200/90 rounded-lg py-1.5 px-3 text-xs text-slate-700"
                               >
-                                <FileText size={12} className="text-blue-600" />
-                                <span className="font-semibold">
+                                <FileText size={13} className="text-blue-600" />
+                                <span className="font-semibold text-slate-800">
                                   {src.name}
                                 </span>
                                 {src.note && (

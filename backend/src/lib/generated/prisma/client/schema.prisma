@@ -88,6 +88,8 @@ model BusinessProfile {
   sector                 String   @db.VarChar(50)
   sectorOther            String?  @map("sector_other") @db.VarChar(100)
   address                String   @db.VarChar(255)
+  latitude               Decimal? @db.Decimal(9, 6)
+  longitude              Decimal? @db.Decimal(9, 6)
   quarterlyRevenueTarget Decimal? @map("quarterly_revenue_target") @db.Decimal(14, 2)
   createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

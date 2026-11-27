@@ -26,7 +26,7 @@ export default function LoginPage({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
@@ -37,48 +37,81 @@ export default function LoginPage({
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    const normalizedEmail = email.toLowerCase().trim();
+    const currentAdminEmail = (adminEmail || "daffarazan616@students.unnes.ac.id").toLowerCase().trim();
 
-      const normalizedEmail = email.toLowerCase().trim();
-      const currentAdminEmail = (adminEmail || "daffarazan616@students.unnes.ac.id").toLowerCase().trim();
-      const currentAdminPassword = adminPassword || "Orbit!Kopi72#Langit9Biru";
+    // Autentikasi Nyata ke Backend API
+    try {
+      let res;
+      try {
+        res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: normalizedEmail, password }),
+        });
+      } catch (_) {
+        res = await fetch("http://localhost:5000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: normalizedEmail, password }),
+        });
+      }
 
-      // Cek apakah login sebagai Admin
-      if (
-        loginRole === "admin" ||
-        normalizedEmail === currentAdminEmail
-      ) {
-        if (password === currentAdminPassword) {
-          if (onAdminLogin) {
-            onAdminLogin();
-          } else if (onLoginSuccess) {
-            onLoginSuccess();
+      if (res && res.ok) {
+        const resJson = await res.json();
+        const token = resJson.data?.token;
+        const user = resJson.data?.user;
+
+        if (token) {
+          localStorage.setItem("token", token);
+          localStorage.setItem("nexum_token", token);
+          if (user) localStorage.setItem("user", JSON.stringify(user));
+
+          setIsLoading(false);
+          if (user?.role === "ADMIN" || loginRole === "admin" || normalizedEmail === currentAdminEmail) {
+            if (onAdminLogin) return onAdminLogin();
           }
-          return;
-        } else {
-          setErrorMessage(
-            `Kata sandi Administrator salah. Gunakan sandi default '${currentAdminPassword}' atau sesuaikan dengan password terbaru.`
-          );
+          if (onLoginSuccess) return onLoginSuccess();
           return;
         }
       }
 
-      // Login Pelaku UMKM biasa
-      try {
-        localStorage.removeItem("nexum_ai_chat_history");
-        sessionStorage.removeItem("nexum_ai_chat_history");
-      } catch (_) {}
-      if (onLoginSuccess) {
-        onLoginSuccess();
+      // Jika server mengembalikan status error (400, 401, dll)
+      if (res) {
+        const errJson = await res.json().catch(() => ({}));
+        setIsLoading(false);
+        const errMsg =
+          errJson.error ||
+          errJson.message ||
+          errJson.details?.[0]?.message ||
+          "Email atau kata sandi tidak valid.";
+        setErrorMessage(errMsg);
+        return;
       }
-    }, 800);
+    } catch (apiErr) {
+      console.error("Gagal terhubung ke API login:", apiErr);
+      setIsLoading(false);
+      setErrorMessage(
+        "Tidak dapat terhubung ke server backend (port 5000). Pastikan backend sedang aktif ('npm run dev')."
+      );
+      return;
+    }
+
+    setIsLoading(false);
+    setErrorMessage("Autentikasi gagal. Silakan periksa kembali email dan kata sandi Anda.");
   };
 
   const handleAutoFillAdmin = () => {
     setLoginRole("admin");
     setEmail(adminEmail || "daffarazan616@students.unnes.ac.id");
     setPassword(adminPassword || "Orbit!Kopi72#Langit9Biru");
+    setErrorMessage("");
+  };
+
+  const handleAutoFillUmkm = () => {
+    setLoginRole("umkm");
+    setEmail("daffazen1@gmail.com");
+    setPassword("Password123!");
     setErrorMessage("");
   };
 
@@ -196,6 +229,25 @@ export default function LoginPage({
                     type="button"
                     onClick={handleAutoFillAdmin}
                     className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-[10px] shrink-0 transition-colors shadow-xs"
+                  >
+                    Isi Otomatis
+                  </button>
+                </div>
+              )}
+
+              {/* UMKM Quick Credentials Pill */}
+              {loginRole === "umkm" && (
+                <div className="mb-5 p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-[11px] text-blue-900 flex items-center justify-between gap-2">
+                  <div>
+                    <span className="font-bold">Akun Terdaftar (Data Warung Kopi):</span>
+                    <div className="font-mono text-[10px] text-blue-800">
+                      daffazen1@gmail.com / Password123!
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAutoFillUmkm}
+                    className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px] shrink-0 transition-colors shadow-xs"
                   >
                     Isi Otomatis
                   </button>

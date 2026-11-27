@@ -7,24 +7,34 @@ import {
   Eye,
   EyeOff,
   ArrowLeft,
+  Store,
+  CheckCircle2,
+  Building2,
 } from "lucide-react";
 
-export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding }) {
+export default function RegisterPage({
+  onNavigateToLogin,
+  onNavigateToLanding,
+  onRegisterSuccess,
+}) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [sector, setSector] = useState("F&B / Kuliner");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Perhitungan indikator kekuatan kata sandi sederhana (3 bar)
   const calculateStrength = (pass) => {
     if (!pass) return 0;
     let score = 0;
     if (pass.length >= 8) score++;
-    if (/[A-Z]/.test(pass) || /[0-9]/.test(pass)) score++;
+    if (/[A-Z]/.test(pass) && /[0-9]/.test(pass)) score++;
     if (
       /[^A-Za-z0-9]/.test(pass) ||
       (pass.length >= 10 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))
@@ -35,9 +45,10 @@ export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding })
 
   const strength = calculateStrength(password);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setSuccessMessage("");
 
     if (!agreeTerms) {
       setErrorMessage(
@@ -46,8 +57,23 @@ export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding })
       return;
     }
 
+    if (fullName.trim().length < 2) {
+      setErrorMessage("Nama lengkap minimal 2 karakter.");
+      return;
+    }
+
     if (password.length < 8) {
       setErrorMessage("Kata sandi minimal 8 karakter.");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setErrorMessage("Kata sandi harus mengandung minimal 1 huruf besar (A-Z).");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setErrorMessage("Kata sandi harus mengandung minimal 1 angka (0-9).");
       return;
     }
 
@@ -57,14 +83,65 @@ export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding })
     }
 
     setIsLoading(true);
-    // Simulasi proses pendaftaran akun UMKM
-    setTimeout(() => {
-      setIsLoading(false);
-      alert(`Pendaftaran berhasil untuk Pelaku UMKM: ${fullName} (${email})`);
-      if (onNavigateToLogin) {
-        onNavigateToLogin();
+
+    try {
+      const payload = {
+        name: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        businessName: businessName.trim() || undefined,
+        sector: sector || undefined,
+      };
+
+      let response;
+      try {
+        response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } catch (proxyErr) {
+        response = await fetch("http://localhost:5000/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
       }
-    }, 1200);
+
+      const resJson = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const errorMsg =
+          resJson.error ||
+          resJson.message ||
+          `Pendaftaran akun gagal (status ${response.status}).`;
+        setErrorMessage(errorMsg);
+        setIsLoading(false);
+        return;
+      }
+
+      const { user, token } = resJson.data || {};
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      setSuccessMessage("Pendaftaran akun berhasil! Mengalihkan ke aplikasi...");
+      setIsLoading(false);
+
+      setTimeout(() => {
+        if (onRegisterSuccess) {
+          onRegisterSuccess();
+        } else if (onNavigateToLogin) {
+          onNavigateToLogin();
+        }
+      }, 1200);
+    } catch (err) {
+      setErrorMessage(`Kendala koneksi ke server: ${err.message}. Pastikan server backend aktif.`);
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleRegister = () => {
@@ -137,6 +214,14 @@ export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding })
                 </div>
               )}
 
+              {/* Success Alert */}
+              {successMessage && (
+                <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-lg flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>{successMessage}</span>
+                </div>
+              )}
+
               {/* Registration Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Field 1: Nama Lengkap */}
@@ -194,6 +279,66 @@ export default function RegisterPage({ onNavigateToLogin, onNavigateToLanding })
                       required
                       className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none rounded-lg"
                     />
+                  </div>
+                </div>
+
+                {/* Field 3: Nama Usaha / Toko */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label
+                      htmlFor="businessName"
+                      className="text-xs font-semibold text-slate-700"
+                    >
+                      Nama Usaha / Toko
+                    </label>
+                    <span className="text-[11px] text-slate-400">
+                      Opsional
+                    </span>
+                  </div>
+                  <div className="relative flex items-center bg-[#F1F4F9] rounded-lg border border-transparent focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                    <div className="pl-3.5 pr-1 text-slate-400 flex items-center pointer-events-none">
+                      <Store size={16} />
+                    </div>
+                    <input
+                      id="businessName"
+                      type="text"
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      placeholder="Contoh: Warung Kopi Nusantara"
+                      className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none rounded-lg"
+                    />
+                  </div>
+                </div>
+
+                {/* Field 4: Sektor Usaha */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label
+                      htmlFor="sector"
+                      className="text-xs font-semibold text-slate-700"
+                    >
+                      Sektor Usaha
+                    </label>
+                    <span className="text-[11px] text-slate-400">
+                      Kategori Analitik
+                    </span>
+                  </div>
+                  <div className="relative flex items-center bg-[#F1F4F9] rounded-lg border border-transparent focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                    <div className="pl-3.5 pr-1 text-slate-400 flex items-center pointer-events-none">
+                      <Building2 size={16} />
+                    </div>
+                    <select
+                      id="sector"
+                      value={sector}
+                      onChange={(e) => setSector(e.target.value)}
+                      className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm text-slate-800 outline-none rounded-lg cursor-pointer"
+                    >
+                      <option value="F&B / Kuliner">F&B / Kuliner & Minuman</option>
+                      <option value="Retail / Toko">Ritel & Toko Kelontong</option>
+                      <option value="Jasa / Servis">Jasa & Pelayanan</option>
+                      <option value="Fashion / Pakaian">Fashion & Pakaian</option>
+                      <option value="Lainnya">Lainnya / Umum</option>
+                    </select>
                   </div>
                 </div>
 

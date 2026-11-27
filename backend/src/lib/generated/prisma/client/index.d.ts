@@ -3338,10 +3338,14 @@ export namespace Prisma {
   }
 
   export type BusinessProfileAvgAggregateOutputType = {
+    latitude: Decimal | null
+    longitude: Decimal | null
     quarterlyRevenueTarget: Decimal | null
   }
 
   export type BusinessProfileSumAggregateOutputType = {
+    latitude: Decimal | null
+    longitude: Decimal | null
     quarterlyRevenueTarget: Decimal | null
   }
 
@@ -3352,6 +3356,8 @@ export namespace Prisma {
     sector: string | null
     sectorOther: string | null
     address: string | null
+    latitude: Decimal | null
+    longitude: Decimal | null
     quarterlyRevenueTarget: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3364,6 +3370,8 @@ export namespace Prisma {
     sector: string | null
     sectorOther: string | null
     address: string | null
+    latitude: Decimal | null
+    longitude: Decimal | null
     quarterlyRevenueTarget: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3376,6 +3384,8 @@ export namespace Prisma {
     sector: number
     sectorOther: number
     address: number
+    latitude: number
+    longitude: number
     quarterlyRevenueTarget: number
     createdAt: number
     updatedAt: number
@@ -3384,10 +3394,14 @@ export namespace Prisma {
 
 
   export type BusinessProfileAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
     quarterlyRevenueTarget?: true
   }
 
   export type BusinessProfileSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
     quarterlyRevenueTarget?: true
   }
 
@@ -3398,6 +3412,8 @@ export namespace Prisma {
     sector?: true
     sectorOther?: true
     address?: true
+    latitude?: true
+    longitude?: true
     quarterlyRevenueTarget?: true
     createdAt?: true
     updatedAt?: true
@@ -3410,6 +3426,8 @@ export namespace Prisma {
     sector?: true
     sectorOther?: true
     address?: true
+    latitude?: true
+    longitude?: true
     quarterlyRevenueTarget?: true
     createdAt?: true
     updatedAt?: true
@@ -3422,6 +3440,8 @@ export namespace Prisma {
     sector?: true
     sectorOther?: true
     address?: true
+    latitude?: true
+    longitude?: true
     quarterlyRevenueTarget?: true
     createdAt?: true
     updatedAt?: true
@@ -3521,6 +3541,8 @@ export namespace Prisma {
     sector: string
     sectorOther: string | null
     address: string
+    latitude: Decimal | null
+    longitude: Decimal | null
     quarterlyRevenueTarget: Decimal | null
     createdAt: Date
     updatedAt: Date
@@ -3552,6 +3574,8 @@ export namespace Prisma {
     sector?: boolean
     sectorOther?: boolean
     address?: boolean
+    latitude?: boolean
+    longitude?: boolean
     quarterlyRevenueTarget?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3569,6 +3593,8 @@ export namespace Prisma {
     sector?: boolean
     sectorOther?: boolean
     address?: boolean
+    latitude?: boolean
+    longitude?: boolean
     quarterlyRevenueTarget?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3582,6 +3608,8 @@ export namespace Prisma {
     sector?: boolean
     sectorOther?: boolean
     address?: boolean
+    latitude?: boolean
+    longitude?: boolean
     quarterlyRevenueTarget?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3595,12 +3623,14 @@ export namespace Prisma {
     sector?: boolean
     sectorOther?: boolean
     address?: boolean
+    latitude?: boolean
+    longitude?: boolean
     quarterlyRevenueTarget?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BusinessProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "sector" | "sectorOther" | "address" | "quarterlyRevenueTarget" | "createdAt" | "updatedAt", ExtArgs["result"]["businessProfile"]>
+  export type BusinessProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "sector" | "sectorOther" | "address" | "latitude" | "longitude" | "quarterlyRevenueTarget" | "createdAt" | "updatedAt", ExtArgs["result"]["businessProfile"]>
   export type BusinessProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     locationAnalyses?: boolean | BusinessProfile$locationAnalysesArgs<ExtArgs>
@@ -3630,6 +3660,8 @@ export namespace Prisma {
       sector: string
       sectorOther: string | null
       address: string
+      latitude: Prisma.Decimal | null
+      longitude: Prisma.Decimal | null
       quarterlyRevenueTarget: Prisma.Decimal | null
       createdAt: Date
       updatedAt: Date
@@ -4066,6 +4098,8 @@ export namespace Prisma {
     readonly sector: FieldRef<"BusinessProfile", 'String'>
     readonly sectorOther: FieldRef<"BusinessProfile", 'String'>
     readonly address: FieldRef<"BusinessProfile", 'String'>
+    readonly latitude: FieldRef<"BusinessProfile", 'Decimal'>
+    readonly longitude: FieldRef<"BusinessProfile", 'Decimal'>
     readonly quarterlyRevenueTarget: FieldRef<"BusinessProfile", 'Decimal'>
     readonly createdAt: FieldRef<"BusinessProfile", 'DateTime'>
     readonly updatedAt: FieldRef<"BusinessProfile", 'DateTime'>
@@ -14159,6 +14193,8 @@ export namespace Prisma {
     sector: 'sector',
     sectorOther: 'sectorOther',
     address: 'address',
+    latitude: 'latitude',
+    longitude: 'longitude',
     quarterlyRevenueTarget: 'quarterlyRevenueTarget',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -14654,6 +14690,8 @@ export namespace Prisma {
     sector?: StringFilter<"BusinessProfile"> | string
     sectorOther?: StringNullableFilter<"BusinessProfile"> | string | null
     address?: StringFilter<"BusinessProfile"> | string
+    latitude?: DecimalNullableFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
+    longitude?: DecimalNullableFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: DecimalNullableFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"BusinessProfile"> | Date | string
     updatedAt?: DateTimeFilter<"BusinessProfile"> | Date | string
@@ -14670,6 +14708,8 @@ export namespace Prisma {
     sector?: SortOrder
     sectorOther?: SortOrderInput | SortOrder
     address?: SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
     quarterlyRevenueTarget?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -14689,6 +14729,8 @@ export namespace Prisma {
     sector?: StringFilter<"BusinessProfile"> | string
     sectorOther?: StringNullableFilter<"BusinessProfile"> | string | null
     address?: StringFilter<"BusinessProfile"> | string
+    latitude?: DecimalNullableFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
+    longitude?: DecimalNullableFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: DecimalNullableFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"BusinessProfile"> | Date | string
     updatedAt?: DateTimeFilter<"BusinessProfile"> | Date | string
@@ -14705,6 +14747,8 @@ export namespace Prisma {
     sector?: SortOrder
     sectorOther?: SortOrderInput | SortOrder
     address?: SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
     quarterlyRevenueTarget?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -14725,6 +14769,8 @@ export namespace Prisma {
     sector?: StringWithAggregatesFilter<"BusinessProfile"> | string
     sectorOther?: StringNullableWithAggregatesFilter<"BusinessProfile"> | string | null
     address?: StringWithAggregatesFilter<"BusinessProfile"> | string
+    latitude?: DecimalNullableWithAggregatesFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
+    longitude?: DecimalNullableWithAggregatesFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: DecimalNullableWithAggregatesFilter<"BusinessProfile"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeWithAggregatesFilter<"BusinessProfile"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"BusinessProfile"> | Date | string
@@ -15580,6 +15626,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15596,6 +15644,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15610,6 +15660,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15626,6 +15678,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15641,6 +15695,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15652,6 +15708,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15664,6 +15722,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16736,12 +16796,16 @@ export namespace Prisma {
     sector?: SortOrder
     sectorOther?: SortOrder
     address?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
     quarterlyRevenueTarget?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type BusinessProfileAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
     quarterlyRevenueTarget?: SortOrder
   }
 
@@ -16752,6 +16816,8 @@ export namespace Prisma {
     sector?: SortOrder
     sectorOther?: SortOrder
     address?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
     quarterlyRevenueTarget?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -16764,12 +16830,16 @@ export namespace Prisma {
     sector?: SortOrder
     sectorOther?: SortOrder
     address?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
     quarterlyRevenueTarget?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type BusinessProfileSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
     quarterlyRevenueTarget?: SortOrder
   }
 
@@ -18980,6 +19050,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -18994,6 +19066,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19317,6 +19391,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19331,6 +19407,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20172,6 +20250,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20187,6 +20267,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20296,6 +20378,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20311,6 +20395,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20404,6 +20490,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20419,6 +20507,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20576,6 +20666,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20591,6 +20683,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20700,6 +20794,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20715,6 +20811,8 @@ export namespace Prisma {
     sector: string
     sectorOther?: string | null
     address: string
+    latitude?: Decimal | DecimalJsLike | number | string | null
+    longitude?: Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20838,6 +20936,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20853,6 +20953,8 @@ export namespace Prisma {
     sector?: StringFieldUpdateOperationsInput | string
     sectorOther?: NullableStringFieldUpdateOperationsInput | string | null
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitude?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quarterlyRevenueTarget?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

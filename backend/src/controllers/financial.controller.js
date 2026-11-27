@@ -1,3 +1,4 @@
+const xlsx = require("xlsx");
 const financialService = require("../services/financial.service");
 const { financialPeriodRepository } = require("../repositories");
 
@@ -104,9 +105,81 @@ const getFinancialPeriods = async (req, res, next) => {
   }
 };
 
+const downloadTemplate = async (req, res, next) => {
+  try {
+    const workbook = xlsx.utils.book_new();
+    const sampleData = [
+      {
+        Periode: "2026-07-01",
+        Pendapatan: 50000000,
+        HPP: 35000000,
+        Beban_Operasional: 10000000,
+        Laba_Bersih: 5000000,
+        Aset_Lancar: 25000000,
+        Persediaan: 10000000,
+        Total_Aset: 80000000,
+        Liabilitas_Lancar: 15000000,
+        Total_Liabilitas: 30000000,
+        Ekuitas: 50000000,
+      },
+      {
+        Periode: "2026-08-01",
+        Pendapatan: 48000000,
+        HPP: 36000000,
+        Beban_Operasional: 10500000,
+        Laba_Bersih: 1500000,
+        Aset_Lancar: 22000000,
+        Persediaan: 9000000,
+        Total_Aset: 78000000,
+        Liabilitas_Lancar: 16000000,
+        Total_Liabilitas: 32000000,
+        Ekuitas: 46000000,
+      },
+      {
+        Periode: "2026-09-01",
+        Pendapatan: 45000000,
+        HPP: 34100000,
+        Beban_Operasional: 12250000,
+        Laba_Bersih: -1350000,
+        Aset_Lancar: 19800000,
+        Persediaan: 8500000,
+        Total_Aset: 75000000,
+        Liabilitas_Lancar: 18000000,
+        Total_Liabilitas: 35000000,
+        Ekuitas: 40000000,
+      },
+    ];
+    const worksheet = xlsx.utils.json_to_sheet(sampleData);
+    xlsx.utils.book_append_sheet(workbook, worksheet, "Laporan_Keuangan");
+    const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+    res.setHeader("Content-Disposition", 'attachment; filename="Template_Laporan_Keuangan_SAK_EMKM.xlsx"');
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    return res.send(buffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteFinancialAnalysis = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await financialService.deleteAnalysis(req.user.id, id);
+    res.status(200).json({
+      success: true,
+      message: `Analisis keuangan ${result.code || id} berhasil dihapus.`,
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   uploadFinancialReport,
   financialAnalysis,
   getFinancialHistory,
   getFinancialPeriods,
+  downloadTemplate,
+  deleteFinancialAnalysis,
 };

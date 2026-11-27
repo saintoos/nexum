@@ -12,7 +12,7 @@ router.use(authenticateToken);
  * Endpoint Pengunggahan Berkas Laporan Keuangan (.xlsx)
  * POST /api/financial/upload
  */
-router.post("/upload", uploadLimiter, handleUploadExcel, financialController.financialAnalysis);
+router.post("/upload", uploadLimiter, handleUploadExcel, financialController.uploadFinancialReport);
 
 /**
  * Endpoint Evaluasi Analisis Risiko Keuangan
@@ -31,5 +31,17 @@ router.get("/history", financialController.getFinancialHistory);
  * GET /api/financial/periods
  */
 router.get("/periods", financialController.getFinancialPeriods);
+
+/**
+ * Endpoint Unduh Berkas Template Excel SAK EMKM
+ * GET /api/financial/template
+ */
+router.get("/template", financialController.downloadTemplate);
+
+/**
+ * Endpoint Hapus Hasil Analisis Keuangan
+ * DELETE /api/financial/analysis/:id
+ */
+router.delete("/analysis/:id", financialController.deleteFinancialAnalysis);
 
 module.exports = router;

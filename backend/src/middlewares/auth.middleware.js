@@ -18,14 +18,16 @@ if (!JWT_SECRET || JWT_SECRET.length < 32) {
  */
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice(7)
+    : (req.query?.token || null);
 
   // Jika tidak ada token (misal dari frontend development / demo session UMKM)
   if (!token) {
     req.user = {
-      id: "usr-demo-umkm",
-      name: "Siti Rahma",
-      email: "siti@contoh.com",
+      id: "4d110d64-d842-45a9-8f30-30ab568afc31",
+      name: "Dev UMKM Tester",
+      email: "dev_umkm@nexum.id",
       role: "UMKM",
       isActive: true,
     };
@@ -39,9 +41,9 @@ async function authenticateToken(req, res, next) {
   } catch (err) {
     // Jika token kedaluwarsa/salah di mode dev, tetap berikan akses demo UMKM
     req.user = {
-      id: "usr-demo-umkm",
-      name: "Siti Rahma",
-      email: "siti@contoh.com",
+      id: "4d110d64-d842-45a9-8f30-30ab568afc31",
+      name: "Dev UMKM Tester",
+      email: "dev_umkm@nexum.id",
       role: "UMKM",
       isActive: true,
     };

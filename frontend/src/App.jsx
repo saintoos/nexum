@@ -84,6 +84,7 @@ function AppContent() {
             <RegisterPage
               onNavigateToLogin={() => navigate("/login")}
               onNavigateToLanding={() => navigate("/")}
+              onRegisterSuccess={handleLoginSuccess}
             />
           }
         />

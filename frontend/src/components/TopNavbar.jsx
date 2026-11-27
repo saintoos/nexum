@@ -2,6 +2,26 @@ import React from "react";
 import { Search } from "lucide-react";
 
 export default function TopNavbar({ onNavigate }) {
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem("user") || "null");
+  } catch (_) {}
+
+  const displayName = user?.name || "Pelaku UMKM";
+  const displayRole =
+    user?.businessProfile?.name
+      ? `${user.businessProfile.name} • ${user.businessProfile.sector || "UMKM"}`
+      : user?.role === "ADMIN"
+      ? "ADMINISTRATOR"
+      : "UMKM";
+  const initials =
+    displayName
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "UM";
+
   return (
     <header className="bg-[#0A2540] text-white px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm shrink-0 z-30">
       {/* Brand Logo */}
@@ -40,14 +60,14 @@ export default function TopNavbar({ onNavigate }) {
         >
           <div className="text-right hidden sm:block">
             <div className="text-xs font-semibold text-white leading-tight group-hover:text-sky-300 transition-colors">
-              Siti Rahma
+              {displayName}
             </div>
-            <div className="text-[10px] text-sky-300 font-medium">
-              UMKM RETAIL
+            <div className="text-[10px] text-sky-300 font-medium uppercase">
+              {displayRole}
             </div>
           </div>
           <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs ring-2 ring-white/20 group-hover:ring-sky-400 transition-all">
-            SR
+            {initials}
           </div>
         </div>
       </div>

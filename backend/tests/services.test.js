@@ -262,6 +262,30 @@ describe("Services Layer Integration Tests (NEXUM Backend)", () => {
       assert.ok(Array.isArray(periodsResult.records));
       assert.equal(periodsResult.records.length, 3);
     });
+
+    it("harus dapat menghapus analisis keuangan dan periode terkait (deleteAnalysis)", async () => {
+      const extraFinancial = await financialService.evaluateRisk(testUser.id, {
+        periods: [
+          {
+            periodStart: "2026-04-01",
+            revenue: 40000000,
+            cogs: 20000000,
+            operatingExpense: 8000000,
+            netIncome: 12000000,
+            currentAssets: 30000000,
+            inventory: 10000000,
+            totalAssets: 70000000,
+            currentLiabilities: 15000000,
+            totalLiabilities: 25000000,
+            equity: 45000000,
+          },
+        ],
+        fileName: "laporan_hapus.xlsx",
+      });
+
+      const deleted = await financialService.deleteAnalysis(testUser.id, extraFinancial.analysis.id);
+      assert.equal(deleted.id, extraFinancial.analysis.id);
+    });
   });
 
   // --------------------------------------------------------------------------

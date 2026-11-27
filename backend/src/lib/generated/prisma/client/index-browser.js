@@ -138,6 +138,8 @@ exports.Prisma.BusinessProfileScalarFieldEnum = {
   sector: 'sector',
   sectorOther: 'sectorOther',
   address: 'address',
+  latitude: 'latitude',
+  longitude: 'longitude',
   quarterlyRevenueTarget: 'quarterlyRevenueTarget',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

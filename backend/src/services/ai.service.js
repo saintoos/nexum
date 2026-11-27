@@ -96,8 +96,16 @@ const aiService = {
         })
         .catch(() => [])) || [];
 
+    // Dapatkan data rujukan (grounding sources) aktif untuk histori yang menggunakan konteks
+    let groundingSources = [];
+    try {
+      const groundingData = await this.getGroundingData(userId);
+      groundingSources = groundingData.sources || [];
+    } catch (_) {}
+
     return messages.map((msg) => ({
       ...msg,
+      sources: msg.contextUsed ? groundingSources : [],
       structured:
         msg.role === "ASSISTANT" ? this.parseStructuredAnswer(msg.content) : null,
     }));
@@ -141,6 +149,8 @@ const aiService = {
         name: profile.name,
         sector: profile.sector,
         address: profile.address,
+        latitude: profile.latitude ? Number(profile.latitude) : null,
+        longitude: profile.longitude ? Number(profile.longitude) : null,
         targetRevenue: profile.quarterlyRevenueTarget,
       };
       sources.push({

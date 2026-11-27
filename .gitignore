@@ -95,3 +95,4 @@ docker-data/
 # Generated files
 *.min.js
 *.min.css
+backend/.env

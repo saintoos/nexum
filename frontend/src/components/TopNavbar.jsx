@@ -29,9 +29,11 @@ export default function TopNavbar({ onNavigate }) {
         className="flex items-center gap-3 cursor-pointer select-none"
         onClick={() => onNavigate && onNavigate("dashboard")}
       >
-        <span className="font-extrabold text-lg sm:text-xl tracking-wider text-white hover:text-sky-300 transition-colors">
-          NEXUM
-        </span>
+        <img
+          src="/logo-nexum.png"
+          alt="NEXUM"
+          className="h-7 sm:h-8 w-auto object-contain hover:opacity-90 transition-opacity"
+        />
         <span className="text-slate-400 font-light text-sm">|</span>
         <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider text-sky-300 uppercase hidden sm:inline-block">
           INTELLIGENCE FOR UMKM
